@@ -1,0 +1,25 @@
+Combate
+1 - tabuleiro = matrix 10 x 10;
+2 - função pra checar se pode mover -> recebe o ponteiro de (3);
+2.1 - cuidar do caminho do lago;
+3 - um registro pra cada tipo de peça -> alocar dinamicamente -> função do ponteiro = apontar posição para alterar
+rank/peça
+0 bandeira / 1 espiao / 2 soldado / 3 cabo-armeiro / 4 sargento / 5 tenente / 6 capitão / 7 major / 8 coronel
+9 general / 10 marechal / 11 bomba
+4 - um vetor ou uma lista de registro para cada jogador
+5 - função para eliminação
+6 - função de ataque (que depois chamaria a de eliminação?)
+A função compara as peças, retorna 0 se for empate, 1 se o atacante vencer, -1 se o atacante perder.
+6.1 - a peça atacante ocupa o lugar da peça de defesa -> peça de defesa é removida
+6.2 - a peça atacante perde -> peça atacante é removida
+6.3 - empate -> as duas peças são removidas
+6.4 - exceções: 1 ganha do 10, se atacar / 0 e 11 não podem atacar / 3 ganha do 11
+
+
+- Como imprimir o tabuleiro?
+- Numa rodada o azul não pode ver o vermelho
+- No combate os oponentes se revelam
+
+Adicionais
+1 - comando desfazer
+2 - mostrar jogadas anteriores
