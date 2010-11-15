@@ -1,19 +1,27 @@
 Combate
-1 - tabuleiro = matrix 10 x 10;
-2 - função pra checar se pode mover -> recebe o ponteiro de (3);
-2.1 - cuidar do caminho do lago;
+1 - tabuleiro = matriz 10 x 10
+2 - função de movimento -> checa se pode mover -> recebe o ponteiro de (3)
+2.1 - cuidar do caminho do lago
+2.2 - 1 passo em qualquer direção, exceto o soldado
+2.3 - se o soldado anda mais de uma casa ele não pode atacar
+2.4 - bomba e bandeira imóveis
 3 - um registro pra cada tipo de peça -> alocar dinamicamente -> função do ponteiro = apontar posição para alterar
 rank/peça
-0 bandeira / 1 espiao / 2 soldado / 3 cabo-armeiro / 4 sargento / 5 tenente / 6 capitão / 7 major / 8 coronel
-9 general / 10 marechal / 11 bomba
+0 bandeira (1) / 1 espiao (1) / 2 soldado (8)/ 3 cabo-armeiro (5) / 4 sargento (4)/ 5 tenente (4)/ 6 capitão (4)/
+7 major(3) / 8 coronel (2) /9 general (1) / 10 marechal (1) / 11 bomba (6)
 4 - um vetor ou uma lista de registro para cada jogador
 5 - função para eliminação
 6 - função de ataque (que depois chamaria a de eliminação?)
 A função compara as peças, retorna 0 se for empate, 1 se o atacante vencer, -1 se o atacante perder.
-6.1 - a peça atacante ocupa o lugar da peça de defesa -> peça de defesa é removida
-6.2 - a peça atacante perde -> peça atacante é removida
-6.3 - empate -> as duas peças são removidas
+6.1 - 1 : a peça atacante ocupa o lugar da peça de defesa -> peça de defesa é removida
+6.2 - -1: a peça atacante perde -> peça atacante é removida
+6.3 - 0: empate -> as duas peças são removidas
 6.4 - exceções: 1 ganha do 10, se atacar / 0 e 11 não podem atacar / 3 ganha do 11
+7 - função para imprimir
+7.1 - considerar o jogador corrente para mostrar como x as peças do oponente
+7.2 - delay(5000) para proxima jogada
+7.3 - estilo batalha naval
+7.4 - inverter a posição do tabuleiro a cada jogada * OPCIONAL!!
 
 
 - Como imprimir o tabuleiro?
@@ -22,4 +30,3 @@ A função compara as peças, retorna 0 se for empate, 1 se o atacante vencer, -
 
 Adicionais
 1 - comando desfazer
-2 - mostrar jogadas anteriores
