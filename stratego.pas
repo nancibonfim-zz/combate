@@ -16,9 +16,9 @@ type
    
 var
    inicio    : no_pecas;
-   tabuleiro : array [1..10, 1..10] of integer;
-   a         : array [1..11] of integer;
-   b         : array [1..11] of integer;
+   tabuleiro : array [1..10, 1..10] of ^pecas;
+   jogadores : array [1..2, 0..11] of integer;
+   n         : integer;
    
 {Criação da lista de peças}
 procedure lista_pecas(var inicio : no_pecas; n : string; r : integer);
@@ -32,7 +32,7 @@ begin
    else
    begin
       aux2 := inicio;
-      while aux2^.prox <> nil do
+      while (aux2^.prox <> nil) do
          aux2 := aux2^.prox;
       aux2^.prox := aux1;
    end;
@@ -59,9 +59,9 @@ end; { dados_pecas }
 procedure pecas_jogadores;
 var i  : integer;
 begin
-   a[1] := 1; a[2] := 8; a[3] := 5; a[4] := 4; a[5] := 4; a[6] := 4; a[7] := 3; a[8]:= 2; a[9] := 1; a[10] := 1; a[11] := 6;
-   for i:=1 to 11 do
-      b[i] := a[i];
+   jogadores[1][0] := 1; jogadores[1][1] := 1; jogadores[1][2] := 8; jogadores[1][3] := 5; jogadores[1][4] := 4; jogadores[1][5] := 4; jogadores[1][6] := 4; jogadores[1][7] := 3; jogadores[1][8]:= 2; jogadores[1][9] := 1; jogadores[1][10] := 1; jogadores[1][11] := 6;
+   for i:=0 to 11 do
+      jogadores[2][i] := jogadores[2][i];
 end; { pecas_jogadores }
 
 {função apenas de teste, para ver se a lista tava funcionando de boa}
@@ -89,8 +89,50 @@ lembrando, são 40 peças... talvez fique grande demais em uma função só, ou 
 Ja ia esquecendo... a bomba não entra no vetor de peças dos jogadores. Como é só uma, não ataca, não mata e não move é desnecessário para o objetivo.
 }
 
+{Procedimento para dispor as peças de determinado jogador (a ou b) no tabuleiro}
+procedure dispor_pecas(x : integer );
+var q, linha, coluna, rank : integer;
+   aux                     : no_pecas;
+begin
+   q := 0;
+   repeat
+      aux := inicio;
+      writeln('Digite o rank de uma peça. Use 11 para bomba e 0 para bandeira');
+      readln(rank);
+      if (jogadores[x][rank] = 0) or (rank < 0) or (rank > 12) then
+      begin
+         writeln('Peça indisponível');
+         dispor_pecas(x); {Se o rank digitado estiver indisponível chamamos o procedimento novamente}
+      end;         
+      while (aux^.rank <> rank) and (aux <> nil) do
+      begin
+         aux := aux^.prox;
+      end;
+      repeat
+         writeln('Digite a posição da peça');
+         readln(linha, coluna);
+         if (x = 1) then
+         begin
+            if (linha < 0) or (linha > 4) then
+               writeln('Posição inválida');
+         end
+         else
+            if (linha > 20) or (linha < 17) then
+               writeln('Posição inválida');
+         
+         
+
+      tabuleiro[linha][coluna] := aux;
+      jogadores[x][rank] := jogadores[x][rank] - 1;
+      inc(q);
+   until (q = 2); {XXX: q = 40}
+end; { dispor_pecas }
+
 {Programa principal}
 begin
    dados_pecas;
    teste_imprime;
+   pecas_jogadores;
+   n := 1;
+   dispor_pecas(n);
 end.
