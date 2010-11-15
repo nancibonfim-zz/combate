@@ -59,7 +59,18 @@ end; { dados_pecas }
 procedure pecas_jogadores;
 var i  : integer;
 begin
-   jogadores[1][0] := 1; jogadores[1][1] := 1; jogadores[1][2] := 8; jogadores[1][3] := 5; jogadores[1][4] := 4; jogadores[1][5] := 4; jogadores[1][6] := 4; jogadores[1][7] := 3; jogadores[1][8]:= 2; jogadores[1][9] := 1; jogadores[1][10] := 1; jogadores[1][11] := 6;
+   jogadores[1][0] := 1;
+   jogadores[1][1] := 1;
+   jogadores[1][2] := 8;
+   jogadores[1][3] := 5;
+   jogadores[1][4] := 4;
+   jogadores[1][5] := 4;
+   jogadores[1][6] := 4;
+   jogadores[1][7] := 3;
+   jogadores[1][8] := 2;
+   jogadores[1][9] := 1;
+   jogadores[1][10] := 1;
+   jogadores[1][11] := 6;
    for i:=0 to 11 do
       jogadores[2][i] := jogadores[2][i];
 end; { pecas_jogadores }
@@ -100,16 +111,18 @@ begin
       aux := inicio;
       writeln('Digite o rank de uma peça. Use 11 para bomba e 0 para bandeira');
       readln(rank);
-      if (jogadores[x][rank] = 0) or (rank < 0) or (rank > 12) then
+      {Se o jogador digitar um rank inválido ele terá que digitar novamente}
+      while (jogadores[x][rank] = 0) or (rank < 0) or (rank > 12) do
       begin
-         writeln('Peça indisponível');
-         dispor_pecas(x); {Se o rank digitado estiver indisponível chamamos o procedimento novamente}
-      end;         
+         writeln('Peça indisponível. Por favor, digite novamente o rank');
+         readln(rank);
+      end;
+      {A auxiliar vai percorrer a lista até achar o rank correspondente}
       while (aux^.rank <> rank) and (aux <> nil) do
       begin
          aux := aux^.prox;
       end;
-      cheq := false;
+      cheq := false; {Variável para verificar se o jogador digitou uma posição válida no tabuleiro}
       repeat   
          writeln('Digite a posição da peça');
          readln(linha, coluna);
@@ -127,8 +140,9 @@ begin
                cheq := true;
       until (cheq = true);
       tabuleiro[linha][coluna] := aux;
-      jogadores[x][rank] := jogadores[x][rank] - 1;
+      dec(jogadores[x][rank]); {Decrementa o número de peças disponíveis}
       inc(q);
+      imprime_tabuleiro;
    until (q = 2); {XXX: q = 40}
 end; { dispor_pecas }
 
