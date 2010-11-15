@@ -15,10 +15,10 @@ type
             end;
    
 var
-   inicio    : no_pecas;
-   tabuleiro : array [1..10, 1..10] of ^pecas;
-   jogadores : array [1..2, 0..11] of integer;
-   n         : integer;
+   inicio, lago : no_pecas;
+   tabuleiro    : array [1..10, 1..10] of ^pecas;
+   jogadores    : array [1..2, 0..11] of integer;
+   n            : integer;
    
 {Criação da lista de peças}
 procedure lista_pecas(var inicio : no_pecas; n : string; r : integer);
@@ -92,6 +92,7 @@ Ja ia esquecendo... a bomba não entra no vetor de peças dos jogadores. Como é
 {Procedimento para dispor as peças de determinado jogador (a ou b) no tabuleiro}
 procedure dispor_pecas(x : integer );
 var q, linha, coluna, rank : integer;
+   cheq                    : boolean;
    aux                     : no_pecas;
 begin
    q := 0;
@@ -108,31 +109,69 @@ begin
       begin
          aux := aux^.prox;
       end;
-      repeat
+      cheq := false;
+      repeat   
          writeln('Digite a posição da peça');
          readln(linha, coluna);
          if (x = 1) then
          begin
             if (linha < 0) or (linha > 4) then
-               writeln('Posição inválida');
+               writeln('Posição inválida')
+            else
+               cheq := true;
          end
          else
             if (linha > 20) or (linha < 17) then
-               writeln('Posição inválida');
-         
-         
-
+               writeln('Posição inválida')
+            else
+               cheq := true;
+      until (cheq = true);
       tabuleiro[linha][coluna] := aux;
       jogadores[x][rank] := jogadores[x][rank] - 1;
       inc(q);
    until (q = 2); {XXX: q = 40}
 end; { dispor_pecas }
 
+procedure preenche_lago;
+begin
+   tabuleiro[5][3] := lago;
+   tabuleiro[5][4] := lago;
+   tabuleiro[6][3] := lago;
+   tabuleiro[6][4] := lago;
+   tabuleiro[5][7] := lago;
+   tabuleiro[5][8] := lago;
+   tabuleiro[6][7] := lago;
+   tabuleiro[6][8] := lago;
+end; { preenche_lago }
+
+procedure imprime_tabuleiro;
+var i, j : integer;
+begin
+   for i := 1 to 10 do
+   begin
+      for j := 1 to 10 do
+         if (tabuleiro[i][j] = nil) then
+            write('__ ')
+         else
+            if (tabuleiro[i][j] = lago) then
+               write('XX ')
+            else
+               write(tabuleiro[i][j]^.rank:2, ' ');
+      writeln;
+   end;
+end; { imprime_tabuleiro }
+
 {Programa principal}
 begin
+   {preenchimento da área do lago... como temos uma matriz de ponteiros, temos um ponteiro para o lago ser inserido no tabuleiro}
+   new(lago);
+   lago^.rank := -1;
+   lago^.nome := 'lago';
+   preenche_lago;
+
    dados_pecas;
-   teste_imprime;
    pecas_jogadores;
    n := 1;
    dispor_pecas(n);
+   imprime_tabuleiro;
 end.
