@@ -17,11 +17,11 @@ type
             end;       
    
 var
-   jog1, jog2, lago                         : no_pecas;
-   tabuleiro                                : array [1..10, 1..10] of no_pecas;
-   controle_pecas                           : array [0..11] of integer;
-   linha_atual, linha, coluna_atual, coluna : integer;
-   
+   jog1, jog2, lago                                  : no_pecas;
+   tabuleiro                                         : array [1..10, 1..10] of no_pecas;
+   controle_pecas                                    : array [0..11] of integer;
+   jogador, linha_atual, linha, coluna_atual, coluna : integer;
+                                                     
 {Criação da lista de peças}
 procedure lista_pecas(var inicio : no_pecas; nome : string; rank, jogador : integer);
 var aux1, aux2 : no_pecas;
@@ -248,9 +248,10 @@ end; { valida_movimento }
 
 {Procedimento para cuidar dos movimentos das peças -> linha_atual e coluna_atual são as coordenadas da peça, j é o inteiro que representa o jogador 1 ou 2, linha e coluna são as coordenadas que o jogador pretende mover a peça}
 
-function move_peca(linha_atual, coluna_atual, linha, coluna : integer) : boolean;
+function move_peca(jogador, linha_atual, coluna_atual, linha, coluna : integer) : boolean;
 var espaco1, espaco2 : integer;
 begin
+   {XXX: checar se a peça de origem é do jogador }
    espaco1 := tabuleiro[linha_atual][coluna_atual]^.jogador;
    espaco2 := tabuleiro[linha][coluna]^.jogador;
    
@@ -287,6 +288,9 @@ begin
    final_jogo := aux;
 end;
 
+var
+   final : boolean;
+
 {Programa principal}
 begin
    {preenchimento da área do lago... como temos uma matriz de ponteiros, temos um ponteiro para o lago ser inserido no tabuleiro}
@@ -304,13 +308,15 @@ begin
    {Dispõe peças para os dois jogadores}
    dispor_pecas(jog1);
    dispor_pecas(jog2);
+   jogador := 1;
    {Inicio do jogo}
    repeat
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
       writeln('Informe as coordenadas do espaço desejado');
       readln(linha, coluna);
-      move_peca(linha_atual, coluna_atual, linha, coluna);
-      final_jogo();
-   until (final_jogo);
+      move_peca(jogador, linha_atual, coluna_atual, linha, coluna);
+      final := final_jogo(jogador);
+      jogador := (jogador mod 2) + 1;
+   until (final);
 end.
