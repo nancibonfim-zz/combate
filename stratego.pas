@@ -8,9 +8,9 @@ uses CRT;
 
 type
    no_pecas = ^pecas;
-   pecas  = record {lista de peÁas}
+   pecas  = record {lista de pe√ßas}
                nome    : string[13];
-               rank    : integer; {rank da peÁa - vai de 0 a 11}
+               rank    : integer; {rank da pe√ßa - vai de 0 a 11}
                qtde    : integer;
                jogador : integer;
                prox    : no_pecas;
@@ -22,7 +22,7 @@ var
    controle_pecas                                    : array [0..11] of integer;
    jogador, linha_atual, linha, coluna_atual, coluna : integer;
                                                      
-{CriaÁ„o da lista de peÁas}
+{Cria√ß√£o da lista de pe√ßas}
 procedure lista_pecas(var inicio : no_pecas; nome : string; rank, jogador : integer);
 var aux1, aux2 : no_pecas;
 begin
@@ -30,7 +30,7 @@ begin
    aux1^.nome := nome;
    aux1^.rank := rank;
    aux1^.jogador := jogador;
-   aux1^.qtde := 0; {quantidade posicionada de peÁas -> comeÁa com 0}
+   aux1^.qtde := 0; {quantidade posicionada de pe√ßas -> come√ßa com 0}
    if (inicio = nil) then
       inicio := aux1
    else
@@ -42,7 +42,7 @@ begin
    end;
 end; { lista_pecas }
 
-{O procedimento a seguir insere os dados das peÁas do jogo na lista}
+{O procedimento a seguir insere os dados das pe√ßas do jogo na lista}
 procedure dados_pecas(inicio : no_pecas; jogador : integer);
 begin
    lista_pecas(inicio, 'bomba', 0, jogador);
@@ -59,7 +59,7 @@ begin
    lista_pecas(inicio, 'bomba', 11, jogador);
 end; { dados_pecas }
 
-{Procedimento para preencher os vetores dos jogadores com as quantidades de cada peÁa -> as funÁıes devem alterar esse valor}
+{Procedimento para preencher os vetores dos jogadores com as quantidades de cada pe√ßa -> as fun√ß√µes devem alterar esse valor}
 procedure pecas_jogadores;
 begin
    controle_pecas[0] := 1;
@@ -106,7 +106,7 @@ begin
    end;
 end; { imprime_tabuleiro }
 
-{FunÁ„o para localizar o rank na lista, se ele for v·lido}
+{Fun√ß√£o para localizar o rank na lista, se ele for v√°lido}
 function acha_rank(inicio : no_pecas; rank : integer): no_pecas;
 var aux : no_pecas;
 begin
@@ -118,7 +118,7 @@ begin
    acha_rank := aux;
 end;
       
-{Procedimento para dispor as peÁas de determinado jogador (a ou b) no tabuleiro}   
+{Procedimento para dispor as pe√ßas de determinado jogador (a ou b) no tabuleiro}   
 procedure dispor_pecas(inicio : no_pecas);
 var q, linha, coluna, rank : integer;
    checagem                : boolean;
@@ -126,35 +126,35 @@ var q, linha, coluna, rank : integer;
 begin
    q := 0;
    repeat
-      writeln('Digite o rank de uma peÁa. Use 11 para bomba e 0 para bandeira');
+      writeln('Digite o rank de uma pe√ßa. Use 11 para bomba e 0 para bandeira');
       readln(rank);
       aux := acha_rank(inicio, rank);
-      {Se o jogador digitar um rank inv·lido ele ter· que digitar novamente}
+      {Se o jogador digitar um rank inv√°lido ele ter√° que digitar novamente}
       while (aux <> nil) or (aux^.qtde < controle_pecas[rank]) do
       begin
-         writeln('PeÁa indisponÌvel. Por favor, digite novamente o rank');
+         writeln('Pe√ßa indispon√≠vel. Por favor, digite novamente o rank');
          readln(rank);
          aux := acha_rank(inicio, rank);
       end;
-      checagem := false; {Vari·vel para verificar se o jogador digitou uma posiÁ„o v·lida no tabuleiro}
+      checagem := false; {Vari√°vel para verificar se o jogador digitou uma posi√ß√£o v√°lida no tabuleiro}
       repeat   
-         writeln('Digite a posiÁ„o da peÁa');
+         writeln('Digite a posi√ß√£o da pe√ßa');
          readln(linha, coluna);
          if (aux^.jogador = 1) then
          begin
             if (linha < 0) or (linha > 4) then
-               writeln('PosiÁ„o inv·lida')
+               writeln('Posi√ß√£o inv√°lida')
             else
                checagem := true;
          end
          else
             if (linha > 20) or (linha < 17) then
-               writeln('PosiÁ„o inv·lida')
+               writeln('Posi√ß√£o inv√°lida')
             else
                checagem := true;
       until (checagem = true);
       tabuleiro[linha][coluna] := aux;
-      inc(aux^.qtde); {Incrementa o n˙mero de peÁas j· alocadas na lista do jogador}
+      inc(aux^.qtde); {Incrementa o n√∫mero de pe√ßas j√° alocadas na lista do jogador}
       inc(q);
       imprime_tabuleiro;
    until (q = 2); {XXX: q = 40}
@@ -162,16 +162,16 @@ end; { dispor_pecas }
 
 procedure remove_peca(peca : no_pecas);
 begin
-   {Decrementa o vetor que diz a quantidade de cada peÁa}
+   {Decrementa o vetor que diz a quantidade de cada pe√ßa}
    dec(peca^.qtde);
 end; { remove_peca }
 
 {
-FunÁ„o de combate: ela checa qual peÁa ganha no combate direto
+Fun√ß√£o de combate: ela checa qual pe√ßa ganha no combate direto
 Valores de retorno:
-0 para empate -> exclus„o das duas peÁas
-1 para vitÛria do atacante -> exclus„o do atacado
--1 para vitÛria do atacado -> exclus„o do atacante
+0 para empate -> exclus√£o das duas pe√ßas
+1 para vit√≥ria do atacante -> exclus√£o do atacado
+-1 para vit√≥ria do atacado -> exclus√£o do atacante
 }
 
 function combate(linha1, coluna1, linha2, coluna2 : integer) : integer;
@@ -179,14 +179,14 @@ var atacante, atacado : no_pecas;
 begin
    atacante := tabuleiro[linha1][coluna1];
    atacado := tabuleiro[linha2][coluna2];
-   {ExceÁ„o 1: cabo-armeiro desarma a bomba}
+   {Exce√ß√£o 1: cabo-armeiro desarma a bomba}
    if (atacante^.rank = 3) and (atacado^.rank = 11) then
    begin
       remove_peca(atacado);
       tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];      
    end
    else
-      {ExceÁ„o 2: se o espi„o atacar o marechal ele ganha}
+      {Exce√ß√£o 2: se o espi√£o atacar o marechal ele ganha}
       if (atacante^.rank = 1) and (atacado^.rank = 10) then
       begin
          remove_peca(atacado);
@@ -213,7 +213,7 @@ begin
                remove_peca(atacante);
                combate:=-1;
             end;
-   {O lugar da peÁa atacante sempre vai ficar vazio -> ou ela toma outro lugar ou ela È derrotada}
+   {O lugar da pe√ßa atacante sempre vai ficar vazio -> ou ela toma outro lugar ou ela √© derrotada}
    tabuleiro[linha1][coluna1] := nil;
 end; { combate }
 
@@ -227,7 +227,7 @@ begin
    begin
       if ((linha = linha_atual + 1) and (coluna = coluna_atual)) or ((linha = linha_atual -1) and (coluna = coluna_atual)) or ((coluna = coluna_atual + 1) and (linha = linha_atual)) or ((coluna = coluna_atual - 1) and (linha = linha_atual)) then
          aux := true;
-      {Regra de movimento de 1 casa horizontal ou vertical v·lida para todas as peÁas, exceto 2}
+      {Regra de movimento de 1 casa horizontal ou vertical v√°lida para todas as pe√ßas, exceto 2}
       if (rank = 2) then
       begin
          if (linha = linha_atual) then
@@ -246,24 +246,24 @@ begin
    valida_movimento := aux;
 end; { valida_movimento }
 
-{Procedimento para cuidar dos movimentos das peÁas -> linha_atual e coluna_atual s„o as coordenadas da peÁa, j È o inteiro que representa o jogador 1 ou 2, linha e coluna s„o as coordenadas que o jogador pretende mover a peÁa}
+{Procedimento para cuidar dos movimentos das pe√ßas -> linha_atual e coluna_atual s√£o as coordenadas da pe√ßa, j √© o inteiro que representa o jogador 1 ou 2, linha e coluna s√£o as coordenadas que o jogador pretende mover a pe√ßa}
 
 function move_peca(jogador, linha_atual, coluna_atual, linha, coluna : integer) : boolean;
 var espaco1, espaco2 : integer;
 begin
-   {XXX: checar se a peÁa de origem È do jogador }
+   {XXX: checar se a pe√ßa de origem √© do jogador }
    espaco1 := tabuleiro[linha_atual][coluna_atual]^.jogador;
    espaco2 := tabuleiro[linha][coluna]^.jogador;
    
-   {Checagem de movimentos inv·lidos}
+   {Checagem de movimentos inv√°lidos}
    if (tabuleiro[linha_atual][coluna_atual]^.rank = 0) or (tabuleiro[linha_atual][coluna_atual]^.rank = 11) then
-      writeln('Movimento inv·lido: peÁa imÛvel. Por favor, tente novamente')
+      writeln('Movimento inv√°lido: pe√ßa im√≥vel. Por favor, tente novamente')
    else
       if (espaco1 = espaco2) then
-         writeln('Movimento inv·lido: peÁa do mesmo jogador. Por favor, tente novamente.')
+         writeln('Movimento inv√°lido: pe√ßa do mesmo jogador. Por favor, tente novamente.')
       else
          if (tabuleiro[linha][coluna]^.rank = -1) then
-            writeln('Movimento inv·lido: ·rea intransit·vel. Por favor, tente novamente.')  
+            writeln('Movimento inv√°lido: √°rea intransit√°vel. Por favor, tente novamente.')  
    else
    begin
       if valida_movimento(linha_atual, coluna_atual, linha, coluna) then
@@ -283,7 +283,7 @@ function final_jogo(jogador : integer) : boolean;
 var aux   : boolean;
    inicio : no_pecas;
 begin
-   {Verificar condiÁıes de final de jogo: advers·rio imÛvel, se a ˙ltima peÁa ataca foi a bandeira...}
+   {Verificar condi√ß√µes de final de jogo: advers√°rio im√≥vel, se a √∫ltima pe√ßa ataca foi a bandeira...}
    aux := false;
    final_jogo := aux;
 end;
@@ -293,7 +293,7 @@ var
 
 {Programa principal}
 begin
-   {preenchimento da ·rea do lago... como temos uma matriz de ponteiros, temos um ponteiro para o lago ser inserido no tabuleiro}
+   {preenchimento da √°rea do lago... como temos uma matriz de ponteiros, temos um ponteiro para o lago ser inserido no tabuleiro}
    new(lago);
    lago^.rank := -1;
    lago^.nome := 'lago';
@@ -301,19 +301,19 @@ begin
    preenche_lago;
    new(jog1);
    new(jog2);
-   {CriaÁ„o de lista para os dois jogadores}
+   {Cria√ß√£o de lista para os dois jogadores}
    dados_pecas(jog1, 1);
    dados_pecas(jog2, 2);
    pecas_jogadores;
-   {Dispıe peÁas para os dois jogadores}
+   {Disp√µe pe√ßas para os dois jogadores}
    dispor_pecas(jog1);
    dispor_pecas(jog2);
    jogador := 1;
    {Inicio do jogo}
    repeat
-      writeln('Informe as coordenadas da peÁa que deseja mover');
+      writeln('Informe as coordenadas da pe√ßa que deseja mover');
       readln(linha_atual, coluna_atual);
-      writeln('Informe as coordenadas do espaÁo desejado');
+      writeln('Informe as coordenadas do espa√ßo desejado');
       readln(linha, coluna);
       move_peca(jogador, linha_atual, coluna_atual, linha, coluna);
       final := final_jogo(jogador);
