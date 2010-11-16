@@ -124,13 +124,13 @@ var q, linha, coluna, rank : integer;
    checagem                : boolean;
    aux                     : no_pecas;
 begin
-   q := 0;
+   q := 0; {Quantidade de peças dispostas... inicia com 0}
    repeat
       writeln('Digite o rank de uma peça. Use 11 para bomba e 0 para bandeira');
       readln(rank);
       aux := acha_rank(inicio, rank);
       {Se o jogador digitar um rank inválido ele terá que digitar novamente}
-      while (aux <> nil) or (aux^.qtde < controle_pecas[rank]) do
+      while (aux = nil) or (aux^.qtde >= controle_pecas[rank]) do
       begin
          writeln('Peça indisponível. Por favor, digite novamente o rank');
          readln(rank);
@@ -148,7 +148,7 @@ begin
                checagem := true;
          end
          else
-            if (linha > 20) or (linha < 17) then
+            if (linha > 10) or (linha < 7) then
                writeln('Posição inválida')
             else
                checagem := true;
@@ -183,7 +183,8 @@ begin
    if (atacante^.rank = 3) and (atacado^.rank = 11) then
    begin
       remove_peca(atacado);
-      tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];      
+      tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];
+      combate := 1;    
    end
    else
       {Exceção 2: se o espião atacar o marechal ele ganha}
@@ -191,6 +192,7 @@ begin
       begin
          remove_peca(atacado);
          tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];
+         combate := 1;
       end
       else
          {Regra: ganha quem tiver maior rank}
@@ -300,11 +302,13 @@ begin
    lago^.jogador := 0;
    preenche_lago;
    new(jog1);
+   jog1^.jogador := 1;
    new(jog2);
+   jog2^.jogador := 2;
    {Criação de lista para os dois jogadores}
+   pecas_jogadores;
    dados_pecas(jog1, 1);
    dados_pecas(jog2, 2);
-   pecas_jogadores;
    {Dispõe peças para os dois jogadores}
    dispor_pecas(jog1);
    dispor_pecas(jog2);
@@ -318,5 +322,5 @@ begin
       move_peca(jogador, linha_atual, coluna_atual, linha, coluna);
       final := final_jogo(jogador);
       jogador := (jogador mod 2) + 1;
-   until (final);
+   until (final); {XXX : informar jogador vencedor}
 end.
