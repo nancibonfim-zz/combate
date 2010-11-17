@@ -310,13 +310,17 @@ begin
    dados_pecas(jog1, 1);
    dados_pecas(jog2, 2);
    {Dispõe peças para os dois jogadores}
+   writeln('Vez do jogador 1');
    dispor_pecas(jog1);
+   writeln;
+   writeln('Vez do jogador 2');
    dispor_pecas(jog2);
    jogador := 1;
    {Inicio do jogo}
    repeat
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
+      {XXX : verificar se o lugar está vazio e se a peça é do jogador da vez}
       writeln('Informe as coordenadas do espaço desejado');
       readln(linha, coluna);
       move_peca(jogador, linha_atual, coluna_atual, linha, coluna);
