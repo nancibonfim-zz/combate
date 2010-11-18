@@ -8,18 +8,18 @@ uses CRT;
 
 type
    no_pecas = ^pecas;
-   pecas  = record {lista de peças}
-               nome    : string[13];
-               rank    : integer; {rank da peça - vai de 0 a 11}
-               qtde    : integer;
+   pecas = record {lista de peças}
+               nome : string[13];
+               rank : integer; {rank da peça - vai de 0 a 11}
+               qtde : integer;
                jogador : integer;
-               prox    : no_pecas;
-            end;       
+               prox : no_pecas;
+            end;
    
 var
-   jog1, jog2, lago                                  : no_pecas;
-   tabuleiro                                         : array [1..10, 1..10] of no_pecas;
-   controle_pecas                                    : array [0..11] of integer;
+   jog1, jog2, lago : no_pecas;
+   tabuleiro : array [1..10, 1..10] of no_pecas;
+   controle_pecas : array [0..11] of integer;
    jogador, linha_atual, linha, coluna_atual, coluna : integer;
                                                      
 {Criação da lista de peças}
@@ -79,6 +79,10 @@ end; { pecas_jogadores }
 
 procedure preenche_lago;
 begin
+new(lago);
+   lago^.rank := -1;
+   lago^.nome := 'lago';
+   lago^.jogador := 0; 
    tabuleiro[5][3] := lago;
    tabuleiro[5][4] := lago;
    tabuleiro[6][3] := lago;
@@ -89,8 +93,10 @@ begin
    tabuleiro[6][8] := lago;
 end; { preenche_lago }
 
-procedure imprime_tabuleiro;
+procedure imprime_tabuleiro(n:integer); {n pode ser 1 ou 2}
 var i, j : integer;
+begin
+if (n = 1) then
 begin
    for i := 1 to 10 do
    begin
@@ -99,12 +105,38 @@ begin
             write('__ ')
          else
             if (tabuleiro[i][j] = lago) then
+               write( 'XX ')
+            else
+            if (tabuleiro[i][j]^.jogador) = 2 then { Aqui !}
+				Write('#  ') { As peças do jogador 2 vão aparecer com o #}
+				else
+				write(tabuleiro[i][j]^.rank:2, ' ');
+      writeln;
+    end;
+    end 
+ else
+ if (n = 2) then
+ begin
+ { Aqui ! }
+     for i := 1 to 10 do
+   begin
+      for j := 1 to 10 do
+         if (tabuleiro[i][j] = nil) then
+            write('__ ')
+         else
+            if (tabuleiro[i][j] = lago) then
                write('XX ')
             else
-               write(tabuleiro[i][j]^.rank:2, ' ');
-      writeln;
-   end;
+            if (tabuleiro[i][j]^.jogador) = 1 then
+				Write('o  ')  {As peças do jogador 1 vão aparecer com o }
+				else
+				write(tabuleiro[i][j]^.rank:2, ' ');
+      writeln; 
+     end;
+   end
+   
 end; { imprime_tabuleiro }
+
 
 {Função para localizar o rank na lista, se ele for válido}
 function acha_rank(inicio : no_pecas; rank : integer): no_pecas;
@@ -118,11 +150,11 @@ begin
    acha_rank := aux;
 end;
       
-{Procedimento para dispor as peças de determinado jogador (a ou b) no tabuleiro}   
-procedure dispor_pecas(inicio : no_pecas);
+{Procedimento para dispor as peças de determinado jogador (a ou b) no tabuleiro}
+procedure dispor_pecas(i:integer; inicio : no_pecas);
 var q, linha, coluna, rank : integer;
-   checagem                : boolean;
-   aux                     : no_pecas;
+   checagem : boolean;
+   aux : no_pecas;
 begin
    q := 0; {Quantidade de peças dispostas... inicia com 0}
    repeat
@@ -137,7 +169,7 @@ begin
          aux := acha_rank(inicio, rank);
       end;
       checagem := false; {Variável para verificar se o jogador digitou uma posição válida no tabuleiro}
-      repeat   
+      repeat
          writeln('Digite a posição da peça');
          readln(linha, coluna);
          if (aux^.jogador = 1) then
@@ -156,7 +188,7 @@ begin
       tabuleiro[linha][coluna] := aux;
       inc(aux^.qtde); {Incrementa o número de peças já alocadas na lista do jogador}
       inc(q);
-      imprime_tabuleiro;
+      imprime_tabuleiro(i);
    until (q = 2); {XXX: q = 40}
 end; { dispor_pecas }
 
@@ -184,7 +216,7 @@ begin
    begin
       remove_peca(atacado);
       tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];
-      combate := 1;    
+      combate := 1;
    end
    else
       {Exceção 2: se o espião atacar o marechal ele ganha}
@@ -250,7 +282,7 @@ end; { valida_movimento }
 
 {Procedimento para cuidar dos movimentos das peças -> linha_atual e coluna_atual são as coordenadas da peça, j é o inteiro que representa o jogador 1 ou 2, linha e coluna são as coordenadas que o jogador pretende mover a peça}
 
-function move_peca(jogador, linha_atual, coluna_atual, linha, coluna : integer) : boolean;
+function move_peca(jogador, linha_atual, coluna_atual, linha, coluna : integer):boolean;
 var espaco1, espaco2 : integer;
 begin
    {XXX: checar se a peça de origem é do jogador }
@@ -265,7 +297,7 @@ begin
          writeln('Movimento inválido: peça do mesmo jogador. Por favor, tente novamente.')
       else
          if (tabuleiro[linha][coluna]^.rank = -1) then
-            writeln('Movimento inválido: área intransitável. Por favor, tente novamente.')  
+            writeln('Movimento inválido: área intransitável. Por favor, tente novamente.')
    else
    begin
       if valida_movimento(linha_atual, coluna_atual, linha, coluna) then
@@ -277,12 +309,12 @@ begin
          end
          else
             combate(linha_atual, coluna_atual, linha, coluna);
-   end
-   
-end; { move_peca }                      
+   end;
+   end;
+ { move_peca }
 
 function final_jogo(jogador : integer) : boolean;
-var aux   : boolean;
+var aux : boolean;
    inicio : no_pecas;
 begin
    {Verificar condições de final de jogo: adversário imóvel, se a última peça ataca foi a bandeira...}
@@ -292,14 +324,20 @@ end;
 
 var
    final : boolean;
+   
+function verif(jogador, linha_atual, coluna_atual:integer):boolean; { Função que verifica se o espaço está vazio, ou se o rank do tabuleiro é diferente de -1 ou se a peça escolhida é de outro player}
+begin
+if (tabuleiro[linha_atual][coluna_atual] <> nil) and (tabuleiro[linha_atual][coluna_atual]^.jogador = jogador) and (tabuleiro[linha_atual][coluna_atual]^.rank <> -1) then
+begin
+verif := true;
+end
+else
+verif := false;  
+end;
 
 {Programa principal}
 begin
    {preenchimento da área do lago... como temos uma matriz de ponteiros, temos um ponteiro para o lago ser inserido no tabuleiro}
-   new(lago);
-   lago^.rank := -1;
-   lago^.nome := 'lago';
-   lago^.jogador := 0;
    preenche_lago;
    new(jog1);
    jog1^.jogador := 1;
@@ -311,20 +349,28 @@ begin
    dados_pecas(jog2, 2);
    {Dispõe peças para os dois jogadores}
    writeln('Vez do jogador 1');
-   dispor_pecas(jog1);
+   dispor_pecas(1,jog1); 
    writeln;
+   clrscr;
+   imprime_tabuleiro(2);
    writeln('Vez do jogador 2');
-   dispor_pecas(jog2);
+   dispor_pecas(2,jog2);
    jogador := 1;
+   clrscr;
+   imprime_Tabuleiro(1);
    {Inicio do jogo}
    repeat
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
-      {XXX : verificar se o lugar está vazio e se a peça é do jogador da vez}
+      if (verif(jogador, linha_atual,coluna_atual)) then {Função que verifica se o espaço está vazio ou se o a peça escolhida é do player }
+      begin
       writeln('Informe as coordenadas do espaço desejado');
       readln(linha, coluna);
       move_peca(jogador, linha_atual, coluna_atual, linha, coluna);
       final := final_jogo(jogador);
-      jogador := (jogador mod 2) + 1;
+      jogador := (jogador mod 2) + 1
+      end;
    until (final); {XXX : informar jogador vencedor}
+      
 end.
+
