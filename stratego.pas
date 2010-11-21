@@ -257,7 +257,7 @@ end; { valida_espaco }
 function valida_movimento(linha_atual, coluna_atual, linha, coluna : integer) : boolean;
 var aux : boolean;
    rank : integer;
-begin
+begin   
    aux := false;
    rank := tabuleiro[linha_atual][coluna_atual]^.rank;
    if (linha > 0) and (linha <= 10) and (coluna > 0) and (coluna <= 10) then
@@ -269,14 +269,24 @@ begin
       begin
          if (linha = linha_atual) then
          begin
-            if (coluna <> coluna_atual) and (tabuleiro[linha][coluna] = nil) then
-               aux := true;
+            aux := true;
+            while (coluna <> coluna_atual) do
+            begin
+               inc(coluna_atual);
+               if (tabuleiro[linha][coluna_atual] <> nil) then
+                  aux := false;
+            end;
          end
          else
             if (coluna = coluna_atual) then
             begin
-               if (linha <> linha_atual) and (tabuleiro[linha][coluna] = nil) then
-                  aux := true;
+               aux := true;
+               while (linha <> linha_atual) do
+               begin
+                  inc(linha_atual);
+                  if (tabuleiro[linha_atual][coluna] <> nil) then
+                     aux := false;
+               end;
             end;
       end;
    end;
@@ -358,7 +368,7 @@ begin
             readln(linha, coluna);
          until (move_peca(jogador, linha_atual, coluna_atual, linha, coluna));
          inc(rodada);
-         jogador := rodada mod 2;
+         jogador := (rodada mod 2) + 1;
          final := final_jogo(jogador);
          imprime_tabuleiro(jogador);
          delay(2000);
