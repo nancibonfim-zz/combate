@@ -17,10 +17,9 @@ type
            end;       
    
 var
+   tabuleiro        : array [1..10, 1..10] of no_pecas;
+   controle_pecas   : array [0..11] of integer;
    jog1, jog2, lago : no_pecas;
-   tabuleiro : array [1..10, 1..10] of no_pecas;
-   controle_pecas : array [0..11] of integer;
-   jogador, linha_atual, linha, coluna_atual, coluna : integer;
    
 {Criação da lista de peças}
 procedure lista_pecas(var inicio : no_pecas; nome : string; rank, jogador : integer);
@@ -59,7 +58,7 @@ begin
    lista_pecas(inicio, 'bomba', 11, jogador);
 end; { dados_pecas }
 
-{Procedimento para preencher os vetores dos jogadores com as quantidades de cada peça -> as funções devem alterar esse valor}
+{Procedimento que preenche o vetor de controle com as quantidades máximas de cada peça}
 procedure pecas_jogadores;
 begin
    controle_pecas[0] := 1;
@@ -93,7 +92,8 @@ begin
    tabuleiro[6][8] := lago;
 end; { preenche_lago }
 
-{Procedimento para impressão do tabuleiro -> Recebe o jogador como parâmetro para ocultar as peças do adversário}
+{Procedimento para impressão do tabuleiro -> recebe o jogador como parâmetro para ocultar as peças do adversário
+ Imprime XX para lago e ## para adversário}
 procedure imprime_tabuleiro(jogador : integer);
 var i, j : integer;
 begin
@@ -109,7 +109,7 @@ begin
                if (tabuleiro[i][j]^.jogador = jogador) then
                   write(tabuleiro[i][j]^.rank:2, ' ')
                else
-                  write('# ');
+                  write('## ');
          writeln;
    end;
 end; { imprime_tabuleiro }
@@ -126,13 +126,13 @@ begin
    acha_rank := aux;
 end;
 
-{Procedimento para dispor as peças de determinado jogador (a ou b) no tabuleiro}
-procedure dispor_pecas(i:integer; inicio : no_pecas);
-var q, linha, coluna, rank : integer;
-   checagem                : boolean;
-   aux                     : no_pecas;
+{Procedimento para dispor as peças de determinado jogador no tabuleiro}
+procedure dispor_pecas(jogador : integer; inicio : no_pecas);
+var qtde, linha, coluna, rank : integer;
+   checagem                   : boolean;
+   aux                        : no_pecas;
 begin                      
-   q := 0; {Quantidade de peças dispostas... inicia com 0}
+   qtde := 0; {Quantidade de peças dispostas... inicia com 0}
    repeat
       writeln('Digite o rank de uma peça. Use 11 para bomba e 0 para bandeira');
       readln(rank);
@@ -163,9 +163,9 @@ begin
       until (checagem = true);
       tabuleiro[linha][coluna] := aux;
       inc(aux^.qtde); {Incrementa o número de peças já alocadas na lista do jogador}
-      inc(q);
-      imprime_tabuleiro(i);
-   until (q = 2); {XXX: q = 40}
+      inc(qtde);
+      imprime_tabuleiro(jogador);
+   until (qtde = 2); {XXX: q = 40}
 end; { dispor_pecas }
 
 procedure remove_peca(peca : no_pecas);
@@ -181,7 +181,6 @@ Valores de retorno:
 1 para vitória do atacante -> exclusão do atacado
 -1 para vitória do atacado -> exclusão do atacante
 }
-
 function combate(linha1, coluna1, linha2, coluna2 : integer) : integer;
 var atacante, atacado : no_pecas;
 begin
@@ -227,31 +226,56 @@ begin
    tabuleiro[linha1][coluna1] := nil;
 end; { combate }
 
-{Funçao verifica se lugar digitado é válido}
-function valida_espaco(jogador, linha, coluna : integer): boolean;
+{Procedimento para exibição de erro}
+procedure erros(erro : integer);
+begin
+   case erro of
+     1 : writeln('Espaço vazio. Por favor, tente novamente.');
+     2 : writeln('Peça inválida. Por favor, tente novamente.');
+     3 : writeln('Peça imóvel. Por favor, tente novamente.');
+   end;
+end; { erros }
+
+{Funçao verifica se a peça que o jogador escolheu para mover é válida
+ recebe um boolean para verificar se imprime ou não o erro}
+function valida_espaco(jogador, linha, coluna : integer; exibe : boolean): boolean;
 var aux : boolean ;
 begin
    aux := false;
    {1. espaço vazio}
    if (tabuleiro[linha][coluna] = nil) then
    begin
-      writeln('Espaço vazio. Por favor, tente novamente.');
+      if (exibe) then erros(1)
    end
    else
       {2. verifica se a peça é do próprio jogador}
       if (tabuleiro[linha][coluna]^.jogador <> jogador) then
-         writeln('Peça inválida. Por favor, tente novamente.')
+      begin
+         if (exibe) then erros(2)
+      end
       else
-      {3. verifica se a peça selecionada é móvel}
-         if (tabuleiro[linha_atual][coluna_atual]^.rank = 0) or (tabuleiro[linha_atual][coluna_atual]^.rank = 11) then
+         {3. verifica se a peça selecionada é móvel}
+         if (tabuleiro[linha][coluna]^.rank = 0) or (tabuleiro[linha][coluna]^.rank = 11) then
          begin
-            writeln('Peça imóvel. Por favor, tente novamente');
+            if (exibe) then erros(3);
          end
          else
             aux := true;
    valida_espaco := aux;
-end; { valida_espaco }   
-   
+end; { valida_espaco }
+
+{Função para ordenar 2 inteiros}
+procedure ordena(var int1, int2 : integer);
+var
+   aux : integer;
+begin
+   if (int1 > int2) then
+   begin
+      aux := int1;
+      int1 := int2;
+      int2 := aux;
+   end;
+end; { ordena }
 
 {Função verifica se o movimento das peças é válido}
 function valida_movimento(linha_atual, coluna_atual, linha, coluna : integer) : boolean;
@@ -260,32 +284,41 @@ var aux : boolean;
 begin   
    aux := false;
    rank := tabuleiro[linha_atual][coluna_atual]^.rank;
+   {Está dentro do tabuleiro?}
    if (linha > 0) and (linha <= 10) and (coluna > 0) and (coluna <= 10) then
    begin
-      if ((linha = linha_atual + 1) and (coluna = coluna_atual)) or ((linha = linha_atual -1) and (coluna = coluna_atual)) or ((coluna = coluna_atual + 1) and (linha = linha_atual)) or ((coluna = coluna_atual - 1) and (linha = linha_atual)) then
+      {Regra de movimento: 1 casa horizontal ou vertical}
+      if ((linha = linha_atual + 1) and (coluna = coluna_atual)) or ((linha = linha_atual -1) and
+         (coluna = coluna_atual)) or ((coluna = coluna_atual + 1) and (linha = linha_atual)) or
+         ((coluna = coluna_atual - 1) and (linha = linha_atual)) then
          aux := true;
-      {Regra de movimento de 1 casa horizontal ou vertical válida para todas as peças, exceto 2}
+      {O 2 pode se mover mais de uma casa, mas não pode atacar se fizer isso
+       Não pode ter ninguém no caminho do ataque}
       if (rank = 2) then
       begin
          if (linha = linha_atual) then
          begin
+            ordena(coluna_atual, coluna);
             aux := true;
+            inc(coluna_atual);
             while (coluna <> coluna_atual) do
             begin
-               inc(coluna_atual);
                if (tabuleiro[linha][coluna_atual] <> nil) then
                   aux := false;
+               inc(coluna_atual);
             end;
          end
          else
             if (coluna = coluna_atual) then
             begin
+               ordena(linha_atual, linha);
                aux := true;
+               inc(linha_atual);
                while (linha <> linha_atual) do
                begin
-                  inc(linha_atual);
                   if (tabuleiro[linha_atual][coluna] <> nil) then
                      aux := false;
+                  inc(linha_atual);
                end;
             end;
       end;
@@ -293,10 +326,11 @@ begin
    valida_movimento := aux;
 end; { valida_movimento }
 
-{Procedimento para cuidar dos movimentos das peças -> linha_atual e coluna_atual são as coordenadas da peça, j é o inteiro que representa o jogador 1 ou 2, linha e coluna são as coordenadas que o jogador pretende mover a peça}
-
+{Procedimento para cuidar dos movimentos das peças -> linha_atual e coluna_atual são as coordenadas da peça
+ j é o inteiro que representa o jogador 1 ou 2, linha e coluna são as coordenadas que o jogador pretende mover a peça}
 function move_peca(jogador, linha_atual, coluna_atual, linha, coluna : integer):boolean;
 begin
+   {Verifica se é possível o movimento}
    move_peca := valida_movimento(linha_atual, coluna_atual, linha, coluna);
    if (move_peca) then
    begin
@@ -314,7 +348,8 @@ begin
 end;
 { move_peca }
 
-function conta_pecas (inicio : no pecas) : integer;
+{Função para contar as peças móveis do jogador -> recebe o ponteiro inicial da lista do jogador correspondente}
+function conta_pecas (inicio : no_pecas) : integer;
 var cont  : integer;
    aux : no_pecas;
 begin
@@ -329,11 +364,13 @@ begin
    conta_pecas := cont;
 end; { conta_pecas }
 
+{Verifica em todo o tabuleiro se as peças do jogador parâmetro podem se mover;
+ a qtde se refere ao número de peças móveis restantes}
 function pode_mover(jogador : no_pecas; qtde : integer) : boolean;
 var
    i, j        : integer;
    nenhum_move : boolean;
-   aux         : no_peca;
+   aux         : no_pecas;
 begin
    i := 1;
    nenhum_move := true;
@@ -344,7 +381,7 @@ begin
       begin
          aux := tabuleiro[i][j];
          { Verifica que existe peça e é do jogador em questão }
-         if (aux <> nil) and valida_espaco(jogador^.jogador, i, j) then
+         if (aux <> nil) and (valida_espaco(jogador^.jogador, i, j, false)) and (aux^.rank <> 0) then
          begin
             { Verifica se a peça pode se mover em alguma direção. Vale mesmo para o caso do
             soldado. A função valida_movimento já verifica se for passado algum valor fora do tabuleiro}
@@ -362,43 +399,43 @@ begin
    pode_mover := not nenhum_move;
 end; { pode_mover }
 
-function final_jogo(jogador : no_pecas ): boolean;
+{Função verifica se o jogo terminou}
+function final_jogo(jogador : integer ): boolean;
 var aux   : boolean;
+   cont   : integer;
    inicio : no_pecas;
 begin
-   {Verificar condições de final de jogo: adversário imóvel, se a última peça ataca foi a bandeira...}
    aux := false;
    cont := 0;
+   {1. verificar na lista adversária se existe a bandeira}
    if (jogador = 1) then
-      inicio := jog1
+      inicio := jog2
    else
-      inicio := jog2;
-   {1. checar bandeira}
+      inicio := jog1;
    while (inicio^.rank <> 0) do
       inicio := inicio^.prox;
    if (inicio^.qtde = 0) then
       aux := true;
    {2. checar peças móveis dos dois jogadores}
    cont := conta_pecas(jog1);
+   {6 é o número máximo de peças que podem ficar imóveis no jogo, portanto só vale a pena verificar a partir dele}
    if (cont <= 6) then
-      if not pode_mover(jog1, cont) then
+      if (not pode_mover(jog1, cont)) then
          aux := true;
    cont := conta_pecas(jog2);
    if (cont <= 6) then
-      if not pode_mover(jog2, cont) then
+      if (not pode_mover(jog2, cont)) then
          aux := true;
-   
    final_jogo := aux;
 end; { final_jogo }
 
-
 var
-   final  : boolean;
-   rodada : integer;
+   final                                                     : boolean;
+   rodada, jogador, linha_atual, linha, coluna_atual, coluna : integer;
    
 {Programa principal}
 begin
-   {preenchimento da área do lago... como temos uma matriz de ponteiros, temos um ponteiro para o lago ser inserido no tabuleiro}
+   {Preenchimento da área do lago}
    preenche_lago;
    {Aloca memória dos ponteiros dos jogadores}
    new(jog1);
@@ -430,7 +467,7 @@ begin
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
       {Verifica se o espaço está vazio ou se o a peça escolhida é do jogador}
-      if (valida_espaco(jogador, linha_atual,coluna_atual)) then 
+      if (valida_espaco(jogador, linha_atual,coluna_atual, true)) then 
       begin
          repeat
             writeln('Informe as coordenadas do espaço desejado');
@@ -444,5 +481,5 @@ begin
          clrscr;
       end;
    until (final); {XXX : informar jogador vencedor}
-   
+   writeln('It is over, baby');
 end.
