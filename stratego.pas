@@ -314,14 +314,83 @@ begin
 end;
 { move_peca }
 
-function final_jogo(jogador : integer) : boolean;
-var aux : boolean;
+function conta_pecas (inicio : no pecas) : integer;
+var cont  : integer;
+   aux : no_pecas;
+begin
+   cont := 0;
+   aux := inicio;
+   while (aux <> nil) do
+   begin
+      if (aux^.rank > 0) and (aux^.rank <= 10) then
+         cont := cont + aux^.qtde;
+      aux := aux^.prox;
+   end;
+   conta_pecas := cont;
+end; { conta_pecas }
+
+function pode_mover(jogador : no_pecas; qtde : integer) : boolean;
+var
+   i, j        : integer;
+   nenhum_move : boolean;
+   aux         : no_peca;
+begin
+   i := 1;
+   nenhum_move := true;
+   while (nenhum_move) and (qtde > 0) and (i <= 10) do
+   begin
+      j := 1;
+      while (nenhum_move) and (qtde > 0) and (j <= 10) do
+      begin
+         aux := tabuleiro[i][j];
+         { Verifica que existe peça e é do jogador em questão }
+         if (aux <> nil) and valida_espaco(jogador^.jogador, i, j) then
+         begin
+            { Verifica se a peça pode se mover em alguma direção. Vale mesmo para o caso do
+            soldado. A função valida_movimento já verifica se for passado algum valor fora do tabuleiro}
+            if (valida_movimento(i, j, i, j + 1)) or (valida_movimento(i, j, i + 1, j)) or
+               (valida_movimento(i, j, i - 1, j)) or (valida_movimento(i, j, i, j - 1)) then
+               nenhum_move := false;
+            { Decrementa o número de peças do jogador que falta serem verificadas }
+            dec(qtde);
+         end;
+         inc(j);
+      end;
+      inc(i);
+   end;
+   
+   pode_mover := not nenhum_move;
+end; { pode_mover }
+
+function final_jogo(jogador : no_pecas ): boolean;
+var aux   : boolean;
    inicio : no_pecas;
 begin
    {Verificar condições de final de jogo: adversário imóvel, se a última peça ataca foi a bandeira...}
    aux := false;
+   cont := 0;
+   if (jogador = 1) then
+      inicio := jog1
+   else
+      inicio := jog2;
+   {1. checar bandeira}
+   while (inicio^.rank <> 0) do
+      inicio := inicio^.prox;
+   if (inicio^.qtde = 0) then
+      aux := true;
+   {2. checar peças móveis dos dois jogadores}
+   cont := conta_pecas(jog1);
+   if (cont <= 6) then
+      if not pode_mover(jog1, cont) then
+         aux := true;
+   cont := conta_pecas(jog2);
+   if (cont <= 6) then
+      if not pode_mover(jog2, cont) then
+         aux := true;
+   
    final_jogo := aux;
-end;
+end; { final_jogo }
+
 
 var
    final  : boolean;
