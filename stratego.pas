@@ -101,15 +101,33 @@ begin
    begin
       for j := 1 to 10 do
          if (tabuleiro[i][j] = nil) then
-            write('__ ')
+         begin
+            textcolor(7); {cor dos espacos = cinza claro}
+            write('__ ');
+         end
          else
             if (tabuleiro[i][j] = lago) then
-               write('XX ')
+            begin
+               textcolor(2); {cor do lago = verde}
+               write('XX ');
+            end
             else
                if (tabuleiro[i][j]^.jogador = jogador) then
-                  write(tabuleiro[i][j]^.rank:2, ' ')
+               begin
+                  if (jogador = 1) then
+                     textcolor(1) {cor das peças do jogador 1 = azul}
+                  else
+                     textcolor(4); {cor das peças do jogador 2 = vermelho}
+                  write(tabuleiro[i][j]^.rank:2, ' ');
+               end
                else
+               begin
+                  if (jogador = 1) then
+                     textcolor(1) {cor das peças do jogador 1 = azul}
+                  else
+                     textcolor(4); {cor das peças do jogador 2 = vermelho}
                   write('## ');
+               end;
          writeln;
    end;
 end; { imprime_tabuleiro }
