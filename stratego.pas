@@ -183,6 +183,7 @@ begin
       inc(aux^.qtde); {Incrementa o número de peças já alocadas na lista do jogador}
       inc(qtde);
       imprime_tabuleiro(jogador);
+      writeln;
    until (qtde = 2); {XXX: q = 40}
 end; { dispor_pecas }
 
@@ -453,6 +454,25 @@ var
    
 {Programa principal}
 begin
+   
+   clrscr;
+   writeln('Seja bem vindo ao COMBATE!':53);
+   writeln;
+   writeln;
+   writeln;
+   writeln;
+   writeln;
+   writeln('Elaborado por Jean, Luísa e Nanci':58);
+   writeln;
+   writeln;
+   writeln;
+   writeln;
+   writeln;
+   writeln('Divirtam-se ^^':47);
+
+   delay(5000);
+   clrscr;
+   
    {Preenchimento da área do lago}
    preenche_lago;
    {Aloca memória dos ponteiros dos jogadores}
@@ -466,12 +486,14 @@ begin
    dados_pecas(jog2, 2);
    {Dispõe peças para os dois jogadores}
    writeln('Vez do jogador 1');
+   writeln;
    dispor_pecas(1,jog1); 
    writeln;
    
    clrscr;
    imprime_tabuleiro(2);
    writeln('Vez do jogador 2');
+   writeln;
    dispor_pecas(2,jog2);
 
    jogador := 1;
@@ -479,9 +501,10 @@ begin
    imprime_tabuleiro(jogador);
    rodada := 0;
    
-   {Inicio do jogo}
+   {Inicio do jogo} 
    repeat
       writeln('Vez do jogador ', jogador);
+      writeln;
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
       {Verifica se o espaço está vazio ou se o a peça escolhida é do jogador}
@@ -499,5 +522,5 @@ begin
          clrscr;
       end;
    until (final); {XXX : informar jogador vencedor}
-   writeln('It is over, baby');
+   writeln('Fim do jogo');
 end.
