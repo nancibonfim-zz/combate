@@ -184,7 +184,7 @@ begin
       inc(qtde);
       imprime_tabuleiro(jogador);
       writeln;
-   until (qtde = 2); {XXX: q = 40}
+   until (qtde = 3); {XXX: q = 40}
 end; { dispor_pecas }
 
 procedure remove_peca(peca : no_pecas);
@@ -317,27 +317,35 @@ begin
       begin
          if (linha = linha_atual) then
          begin
-            ordena(coluna_atual, coluna);
-            aux := true;
-            inc(coluna_atual);
-            while (coluna <> coluna_atual) do
+            {Se o lugar de destino estiver vazio ele checa se o caminho todo esta vazio para não "pular" peça}
+            if (tabuleiro[linha][coluna] = nil) then
             begin
-               if (tabuleiro[linha][coluna_atual] <> nil) then
-                  aux := false;
+               ordena(coluna_atual, coluna);
+               aux := true;
                inc(coluna_atual);
+               while (coluna_atual < coluna) do
+               begin
+                  if (tabuleiro[linha][coluna_atual] <> nil) then
+                     aux := false;
+                  inc(coluna_atual);
+               end;
             end;
          end
          else
             if (coluna = coluna_atual) then
             begin
-               ordena(linha_atual, linha);
-               aux := true;
-               inc(linha_atual);
-               while (linha <> linha_atual) do
+               {Se o lugar de destino estiver vazio ele checa se o caminho todo esta vazio para não "pular" peça}
+               if (tabuleiro[linha][coluna] = nil) then
                begin
-                  if (tabuleiro[linha_atual][coluna] <> nil) then
-                     aux := false;
+                  ordena(linha_atual, linha);
+                  aux := true;
                   inc(linha_atual);
+                  while (linha_atual < linha) do
+                  begin
+                     if (tabuleiro[linha_atual][coluna] <> nil) then
+                        aux := false;
+                     inc(linha_atual);
+                  end;
                end;
             end;
       end;
@@ -505,6 +513,7 @@ begin
    repeat
       writeln('Vez do jogador ', jogador);
       writeln;
+      imprime_tabuleiro(jogador);
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
       {Verifica se o espaço está vazio ou se o a peça escolhida é do jogador}
