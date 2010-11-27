@@ -286,8 +286,10 @@ begin
             if (exibe) then erros(3);
          end
          else
-            if ((tabuleiro[linha][coluna+1]^.jogador = jogador) and (tabuleiro[linha+1][coluna]^.jogador = jogador) and
-                (tabuleiro[linha][coluna-1]^.jogador = jogador) and (tabuleiro[linha-1][coluna]^.jogador = jogador)) then
+            if ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador = jogador) and
+                (tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador = jogador) and
+                (tabuleiro[linha+1][coluna] <> nil) and (tabuleiro[linha+1][coluna]^.jogador = jogador) and
+                (tabuleiro[linha-1][coluna] <> nil) and (tabuleiro[linha-1][coluna]^.jogador = jogador)) then
             begin
                if (exibe) then erros(4);
             end
@@ -450,6 +452,7 @@ begin
 end; { pode_mover }
 
 {Função verifica se o jogo terminou}
+
 function final_jogo(jogador : integer ): boolean;
 var aux   : boolean;
    cont   : integer;
@@ -701,11 +704,11 @@ begin
             writeln('Informe as coordenadas do espaço desejado');
             readln(linha, coluna);
          until (move_peca(jogador, linha_atual, coluna_atual, linha, coluna));
+         imprime_tabuleiro(jogador);
+         delay(2000);         
+         final := final_jogo(jogador);
          inc(rodada);
          jogador := (rodada mod 2) + 1;
-         final := final_jogo(jogador);
-         imprime_tabuleiro(jogador);
-         delay(2000);
          clrscr;
       end;
    until (final); {XXX : informar jogador vencedor}
