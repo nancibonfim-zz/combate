@@ -298,6 +298,7 @@ var aux : boolean;
 begin   
    aux := false;
    rank := tabuleiro[linha_atual][coluna_atual]^.rank;
+
    {Está dentro do tabuleiro?}
    if (linha > 0) and (linha <= 10) and (coluna > 0) and (coluna <= 10) then
    begin
@@ -363,7 +364,16 @@ begin
          tabuleiro[linha_atual][coluna_atual] := nil;
       end
       else
+         {São peças do mesmo jogador?}
+         if (tabuleiro[linha_atual][coluna_atual]^.jogador <> tabuleiro[linha][coluna]^.jogador) then
+         begin
          combate(linha_atual, coluna_atual, linha, coluna);
+         end
+         else
+         begin
+            writeln('Peças do mesmo jogador. Por favor, tente novamente.');
+            move_peca := false;
+         end;
    end
    else
       writeln('Movimento inválido. Por favor, tente novamente.');
@@ -562,7 +572,7 @@ begin
       tabuleiro[9][7]:=	sargento;
       tabuleiro[9][8]:=	bomba;
       tabuleiro[9][9]:=	espiao;
-      tabuleiro[9][10]:=	tenente;
+      tabuleiro[9][10]:= tenente;
       tabuleiro[10][1]:=	soldado;
       tabuleiro[10][2]:=	bomba;
       tabuleiro[10][3]:=	bandeira;
