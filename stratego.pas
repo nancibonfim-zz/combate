@@ -92,9 +92,19 @@ end; { preenche_lago }
 procedure imprime_tabuleiro(jogador : integer);
 var i, j : integer;
 begin
+   write('   ');
    for i := 1 to 10 do
    begin
+      textcolor(14);
+      write(i:2, ' ');
+   end;
+   writeln;
+   for i := 1 to 10 do
+   begin
+      textcolor(14);
+      write(i:2, ' ');
       for j := 1 to 10 do
+      begin
          if (tabuleiro[i][j] = nil) then
          begin
             textcolor(7); {cor dos espacos = cinza claro}
@@ -123,7 +133,8 @@ begin
                      textcolor(4); {cor das peças do jogador 2 = vermelho}
                   write('## ');
                end;
-         writeln;
+      end;
+      writeln;
    end;
 end; { imprime_tabuleiro }
 
