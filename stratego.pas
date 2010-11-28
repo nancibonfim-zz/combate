@@ -95,42 +95,42 @@ begin
    write('   ');
    for i := 1 to 10 do
    begin
-      textcolor(14);
+      textcolor(YELLOW);
       write(i:2, ' ');
    end;
    writeln;
    for i := 1 to 10 do
    begin
-      textcolor(14);
+      textcolor(YELLOW);
       write(i:2, ' ');
       for j := 1 to 10 do
       begin
          if (tabuleiro[i][j] = nil) then
          begin
-            textcolor(7); {cor dos espacos = cinza claro}
+            textcolor(LIGHTGRAY); {cor dos espacos = cinza claro}
             write('__ ');
          end
          else
             if (tabuleiro[i][j] = lago) then
             begin
-               textcolor(2); {cor do lago = verde}
+               textcolor(GREEN); {cor do lago = verde}
                write('XX ');
             end
             else
                if (tabuleiro[i][j]^.jogador = jogador) then
                begin
                   if (tabuleiro[i][j]^.jogador = 1) then
-                     textcolor(1) {cor das peças do jogador 1 = azul}
+                     textcolor(BLUE) {cor das peças do jogador 1 = azul}
                   else
-                     textcolor(4); {cor das peças do jogador 2 = vermelho}
+                     textcolor(RED); {cor das peças do jogador 2 = vermelho}
                   write(tabuleiro[i][j]^.rank:2, ' ');
                end
                else
                begin
                   if (tabuleiro[i][j]^.jogador = 1) then
-                     textcolor(1) {cor das peças do jogador 1 = azul}
+                     textcolor(BLUE) {cor das peças do jogador 1 = azul}
                   else
-                     textcolor(4); {cor das peças do jogador 2 = vermelho}
+                     textcolor(RED); {cor das peças do jogador 2 = vermelho}
                   write('## ');
                end;
       end;
