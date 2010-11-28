@@ -262,6 +262,12 @@ begin
    end;
 end; { erros }
 
+{Função para verificar se determinado espaço está no tabuleiro}
+function no_tabuleiro(linha, coluna : integer ): boolean;
+begin
+   no_tabuleiro := (linha > 0) and (linha <= 10) and (coluna > 0) and (coluna <= 10)
+end; { no_tabuleiro }
+
 {Funçao verifica se a peça que o jogador escolheu para mover é válida
  recebe um boolean para verificar se imprime ou não o erro}
 function valida_espaco(jogador, linha, coluna : integer; exibe : boolean): boolean;
@@ -287,10 +293,10 @@ begin
          end
          else
             {4. Verifica se a peça está livre pra se movimentar}
-            if ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador = jogador) and
-                (tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador = jogador) and
-                (tabuleiro[linha+1][coluna] <> nil) and (tabuleiro[linha+1][coluna]^.jogador = jogador) and
-                (tabuleiro[linha-1][coluna] <> nil) and (tabuleiro[linha-1][coluna]^.jogador = jogador)) then
+            if ((not no_tabuleiro(linha, coluna+1) or ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador = jogador))) and
+                (not no_tabuleiro(linha, coluna-1) or ((tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador = jogador))) and
+                (not no_tabuleiro(linha+1, coluna) or ((tabuleiro[linha+1][coluna] <> nil) and (tabuleiro[linha+1][coluna]^.jogador = jogador))) and
+                (not no_tabuleiro(linha-1, coluna) or ((tabuleiro[linha-1][coluna] <> nil) and (tabuleiro[linha-1][coluna]^.jogador = jogador)))) then
             begin
                if (exibe) then erros(4);
             end
@@ -321,7 +327,7 @@ begin
    rank := tabuleiro[linha_atual][coluna_atual]^.rank;
 
    {Está dentro do tabuleiro?}
-   if (linha > 0) and (linha <= 10) and (coluna > 0) and (coluna <= 10) then
+   if (no_tabuleiro(linha, coluna)) then
    begin
       {Regra de movimento: 1 casa horizontal ou vertical}
       if ((linha = linha_atual + 1) and (coluna = coluna_atual)) or ((linha = linha_atual -1) and
@@ -500,31 +506,6 @@ begin
    end;
 end; { teste_imprime }
 
-
-procedure lista_opcoes(inicio : no_pecas);
-var
- aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-
-begin
-   aux := inicio^.prox;
-   while (aux <> nil) do
-   begin
-      aux^.qtde := controle_pecas[aux^.rank];
-      aux := aux^.prox;
-   end;
-   bandeira:= inicio^.prox;
-   espiao:= bandeira^.prox;
-   soldado:= espiao^.prox;
-   cabo:= soldado^.prox;
-   sargento:= cabo^.prox;
-   tenente:= sargento^.prox;
-   capitao:= tenente^.prox;
-   major:= capitao^.prox;
-   coronel:= major^.prox;
-   general:= coronel^.prox;
-   marechal:= general^.prox;
-   bomba:= marechal^.prox;
-end; { lista_opcoes }
 
 procedure blitzkrieg (inicio : no_pecas; jogador : integer);
 var
