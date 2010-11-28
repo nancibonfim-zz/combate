@@ -286,6 +286,7 @@ begin
             if (exibe) then erros(3);
          end
          else
+            {4. Verifica se a peça está livre pra se movimentar}
             if ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador = jogador) and
                 (tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador = jogador) and
                 (tabuleiro[linha+1][coluna] <> nil) and (tabuleiro[linha+1][coluna]^.jogador = jogador) and
@@ -387,7 +388,13 @@ begin
          {São peças do mesmo jogador?}
          if (tabuleiro[linha_atual][coluna_atual]^.jogador <> tabuleiro[linha][coluna]^.jogador) then
          begin
-         combate(linha_atual, coluna_atual, linha, coluna);
+            if (tabuleiro[linha][coluna] = lago) then
+            begin
+               writeln('Área intransitável. Por favor, tente novamente.');
+               move_peca := false;
+            end
+            else
+               combate(linha_atual, coluna_atual, linha, coluna);
          end
          else
          begin
