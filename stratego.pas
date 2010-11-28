@@ -271,9 +271,12 @@ end; { no_tabuleiro }
 {Funçao verifica se a peça que o jogador escolheu para mover é válida
  recebe um boolean para verificar se imprime ou não o erro}
 function valida_espaco(jogador, linha, coluna : integer; exibe : boolean): boolean;
-var aux : boolean ;
+var
+   adversario : integer;
+   aux        : boolean ;
 begin
    aux := false;
+   adversario := (jogador mod 2) + 1;
    {1. espaço vazio}
    if (tabuleiro[linha][coluna] = nil) then
    begin
@@ -292,11 +295,12 @@ begin
             if (exibe) then erros(3);
          end
          else
+     
             {4. Verifica se a peça está livre pra se movimentar}
-            if ((not no_tabuleiro(linha, coluna+1) or ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador = jogador))) and
-                (not no_tabuleiro(linha, coluna-1) or ((tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador = jogador))) and
-                (not no_tabuleiro(linha+1, coluna) or ((tabuleiro[linha+1][coluna] <> nil) and (tabuleiro[linha+1][coluna]^.jogador = jogador))) and
-                (not no_tabuleiro(linha-1, coluna) or ((tabuleiro[linha-1][coluna] <> nil) and (tabuleiro[linha-1][coluna]^.jogador = jogador)))) then
+            if ((not no_tabuleiro(linha, coluna+1) or ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador <> adversario))) and
+                (not no_tabuleiro(linha, coluna-1) or ((tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador <> adversario))) and
+                (not no_tabuleiro(linha+1, coluna) or ((tabuleiro[linha+1][coluna] <> nil) and (tabuleiro[linha+1][coluna]^.jogador <> adversario))) and
+                (not no_tabuleiro(linha-1, coluna) or ((tabuleiro[linha-1][coluna] <> nil) and (tabuleiro[linha-1][coluna]^.jogador <> adversario)))) then
             begin
                if (exibe) then erros(4);
             end
