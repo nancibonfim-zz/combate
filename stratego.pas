@@ -20,7 +20,9 @@ var
    tabuleiro        : array [1..10, 1..10] of no_pecas;
    controle_pecas   : array [0..11] of integer;
    jog1, jog2, lago : no_pecas;
-   
+   confirma         : char;
+   opcao            : integer;
+
 {Criação da lista de peças}
 procedure lista_pecas(var inicio : no_pecas; nome : string; rank, jogador : integer);
 var aux1, aux2 : no_pecas;
@@ -632,7 +634,7 @@ begin
       tabuleiro[10][9] :=	sargento;
       tabuleiro[10][10] :=	sargento;
    end;
-   
+   imprime_tabuleiro(jogador);
 end; { blitzkrieg }
 
 procedure tempest_defense (inicio : no_pecas; jogador : integer);
@@ -745,7 +747,7 @@ begin
       tabuleiro[10][9] :=	cabo;
       tabuleiro[10][10] :=	major;
    end;
-   
+   imprime_tabuleiro(jogador);
 end; { tempest_defense }
 
 procedure wheel_danger (inicio : no_pecas; jogador : integer);
@@ -858,7 +860,7 @@ begin
       tabuleiro[10][9] :=	soldado;
       tabuleiro[10][10] :=	cabo;
    end;
-   
+   imprime_tabuleiro(jogador);
 end; { wheel_danger }
 
 procedure corner_fortress (inicio : no_pecas; jogador : integer);
@@ -971,7 +973,7 @@ begin
       tabuleiro[10][9] :=	tenente;
       tabuleiro[10][10] :=	bomba;
    end;
-   
+   imprime_tabuleiro(jogador);
 end; { corner_fortress }
 
 procedure corner_blitz (inicio : no_pecas; jogador : integer);
@@ -998,7 +1000,7 @@ begin
    marechal:= general^.prox;
    bomba:= marechal^.prox;
 
-   if (jogador=1) then
+      if (jogador=1) then
    begin
       tabuleiro[1][1] :=	soldado;
       tabuleiro[1][2] :=	tenente;
@@ -1084,7 +1086,7 @@ begin
       tabuleiro[10][9] :=	bomba;
       tabuleiro[10][10] :=	cabo;
    end;
-   
+   imprime_tabuleiro(jogador);   
 end; { corner_blitz }
 
 procedure shoreline_bluff (inicio : no_pecas; jogador : integer);
@@ -1197,7 +1199,7 @@ begin
       tabuleiro[10][9] :=	capitao;
       tabuleiro[10][10] :=	soldado;
    end;
-   
+   imprime_tabuleiro(jogador);   
 end; { shoreline_bluff }
 
 procedure opcoes(opcao, jogador : integer);
@@ -1210,8 +1212,7 @@ begin
       inicio := jog2;
    case opcao of
      1 : begin
-            pecas_jogadores;
-            dados_pecas(inicio, jogador);
+            imprime_tabuleiro(jogador);
             dispor_pecas(jogador, inicio);
          end;
      2 : blitzkrieg(inicio, jogador);
@@ -1219,16 +1220,38 @@ begin
      4 : wheel_danger(inicio, jogador);
      5 : corner_fortress(inicio,jogador);
      6 : corner_blitz(inicio, jogador);
-{     7 : shorelinee_bluff(inicio, jogador);}
+     7 : shoreline_bluff(inicio, jogador);
    else
       writeln('Opção inválida');
    end; { case }
 end; { opcoes }
 
+procedure menu(jogador : integer);
+begin
+   repeat
+      writeln('Vez do jogador ', jogador);
+      writeln;
+      writeln('Escolha a opção:');
+      writeln('1: dispor as peças manualmente');
+      writeln;
+      writeln('Para as opções pré-configuradas digite:');
+      writeln('2: Ataque relâmpago');
+      writeln('3: Tempestade de defesa');
+      writeln('4: Perigo de rodas');
+      writeln('5: Fortaleza de canto');
+      writeln('6: XXX');
+      writeln('7: Blefe litoral');
+      readln(opcao);
+      opcoes(opcao, jogador);
+      writeln('Confirma a opção escolhida? Digite s para sim');
+      readln(confirma);
+   until (confirma = 's');
+end; { menu }
+
 var
    final                                                     : boolean;
-   rodada, opcao, jogador, linha_atual, linha, coluna_atual, coluna : integer;
-   
+   rodada, jogador, linha_atual, linha, coluna_atual, coluna : integer;
+     
 {Programa principal}
 begin
    
@@ -1257,25 +1280,16 @@ begin
    jog1^.jogador := 1;
    new(jog2);
    jog2^.jogador := 2;
+   dados_pecas(jog1, 1);
+   dados_pecas(jog2, 2);
+   pecas_jogadores;
    
    {Dispõe peças para os dois jogadores} 
+   menu(1);
+   clrscr;
+   menu(2);
+   clrscr;
 
-   writeln('Vez do jogador 1');
-   writeln;
-   writeln('Escolha a opção:');
-   writeln('1: dispor as peças manualmente');
-   writeln;
-   writeln('Para as opções pré-configuradas digite:');
-   writeln('2: Ataque relâmpago');
-   writeln('3: Tempestade de defesa');
-   writeln('4: Perigo de rodas');
-   writeln('5: Fortaleza de canto');
-   writeln('6: XXX');
-   writeln('7: Blefe litoral');
-   readln(opcao);
-
-   opcoes(opcao, 1);
-   
    jogador := 1;
    clrscr;
    rodada := 0;
@@ -1295,7 +1309,7 @@ begin
             readln(linha, coluna);
          until (move_peca(jogador, linha_atual, coluna_atual, linha, coluna));
          imprime_tabuleiro(jogador);
-         delay(2000);         
+         delay(3000);         
          final := final_jogo(jogador);
          inc(rodada);
          jogador := (rodada mod 2) + 1;
