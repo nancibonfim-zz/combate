@@ -14,8 +14,8 @@ type
               qtde    : integer;
               jogador : integer;
               prox    : no_pecas;
-           end;       
-   
+           end;
+
 var
    tabuleiro        : array [1..10, 1..10] of no_pecas;
    controle_pecas   : array [0..11] of integer;
@@ -78,7 +78,7 @@ begin
    new(lago);
    lago^.rank := -1;
    lago^.nome := 'lago';
-   lago^.jogador := 0; 
+   lago^.jogador := 0;
    tabuleiro[5][3] := lago;
    tabuleiro[5][4] := lago;
    tabuleiro[6][3] := lago;
@@ -157,7 +157,7 @@ procedure dispor_pecas(jogador : integer; inicio : no_pecas);
 var qtde, linha, coluna, rank : integer;
    checagem                   : boolean;
    aux                        : no_pecas;
-begin                      
+begin
    qtde := 0; {Quantidade de peças dispostas... inicia com 0}
    repeat
       writeln('Digite o rank de uma peça. Use 11 para bomba e 0 para bandeira');
@@ -307,7 +307,7 @@ begin
             if (exibe) then erros(3);
          end
          else
-     
+
             {4. Verifica se a peça está livre pra se movimentar}
             if ((not no_tabuleiro(linha, coluna+1) or ((tabuleiro[linha][coluna+1] <> nil) and (tabuleiro[linha][coluna+1]^.jogador <> adversario))) and
                 (not no_tabuleiro(linha, coluna-1) or ((tabuleiro[linha][coluna-1] <> nil) and (tabuleiro[linha][coluna-1]^.jogador <> adversario))) and
@@ -338,7 +338,7 @@ end; { ordena }
 function valida_movimento(linha_atual, coluna_atual, linha, coluna : integer) : boolean;
 var aux : boolean;
    rank : integer;
-begin   
+begin
    aux := false;
    rank := tabuleiro[linha_atual][coluna_atual]^.rank;
 
@@ -476,7 +476,7 @@ begin
       end;
       inc(i);
    end;
-   
+
    pode_mover := not nenhum_move;
 end; { pode_mover }
 
@@ -527,7 +527,7 @@ end; { final_jogo }
 procedure blitzkrieg (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-   
+
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -640,7 +640,7 @@ end; { blitzkrieg }
 procedure tempest_defense (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-   
+
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -753,7 +753,7 @@ end; { tempest_defense }
 procedure wheel_danger (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-   
+
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -866,7 +866,7 @@ end; { wheel_danger }
 procedure corner_fortress (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-   
+
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -979,7 +979,7 @@ end; { corner_fortress }
 procedure corner_blitz (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-   
+
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -1086,13 +1086,13 @@ begin
       tabuleiro[10][9] :=	bomba;
       tabuleiro[10][10] :=	cabo;
    end;
-   imprime_tabuleiro(jogador);   
+   imprime_tabuleiro(jogador);
 end; { corner_blitz }
 
 procedure shoreline_bluff (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-   
+
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -1199,7 +1199,7 @@ begin
       tabuleiro[10][9] :=	capitao;
       tabuleiro[10][10] :=	soldado;
    end;
-   imprime_tabuleiro(jogador);   
+   imprime_tabuleiro(jogador);
 end; { shoreline_bluff }
 
 procedure opcoes(opcao, jogador : integer);
@@ -1251,10 +1251,10 @@ end; { menu }
 var
    final                                                     : boolean;
    rodada, jogador, linha_atual, linha, coluna_atual, coluna : integer;
-     
+
 {Programa principal}
 begin
-   
+
    clrscr;
    writeln('Seja bem vindo ao COMBATE!':53);
    writeln;
@@ -1272,7 +1272,7 @@ begin
    writeln('Digite uma tecla para iniciar o jogo':58);
    readkey;
    clrscr;
-   
+
    {Preenchimento da área do lago}
    preenche_lago;
    {Aloca memória dos ponteiros dos jogadores}
@@ -1283,8 +1283,8 @@ begin
    dados_pecas(jog1, 1);
    dados_pecas(jog2, 2);
    pecas_jogadores;
-   
-   {Dispõe peças para os dois jogadores} 
+
+   {Dispõe peças para os dois jogadores}
    menu(1);
    clrscr;
    menu(2);
@@ -1293,8 +1293,8 @@ begin
    jogador := 1;
    clrscr;
    rodada := 0;
-   
-   {Inicio do jogo} 
+
+   {Inicio do jogo}
    repeat
       writeln('Vez do jogador ', jogador);
       writeln;
@@ -1302,19 +1302,19 @@ begin
       writeln('Informe as coordenadas da peça que deseja mover');
       readln(linha_atual, coluna_atual);
       {Verifica se o espaço está vazio ou se o a peça escolhida é do jogador}
-      if (valida_espaco(jogador, linha_atual,coluna_atual, true)) then 
+      if (valida_espaco(jogador, linha_atual,coluna_atual, true)) then
       begin
          repeat
             writeln('Informe as coordenadas do espaço desejado');
             readln(linha, coluna);
          until (move_peca(jogador, linha_atual, coluna_atual, linha, coluna));
          imprime_tabuleiro(jogador);
-         delay(3000);         
+         delay(3000);
          final := final_jogo(jogador);
          inc(rodada);
          jogador := (rodada mod 2) + 1;
          clrscr;
       end;
-   until (final); {XXX : informar jogador vencedor}
+   until (final);
    writeln('Fim do jogo');
 end.
