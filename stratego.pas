@@ -174,13 +174,13 @@ begin
          readln(linha, coluna);
          if (aux^.jogador = 1) then
          begin
-            if (linha < 0) or (linha > 4) then
+            if (linha < 0) or (linha > 4) or (tabuleiro[linha][coluna] <> nil) then
                writeln('Posição inválida')
             else
                checagem := true;
          end
          else
-            if (linha > 10) or (linha < 7) then
+            if (linha > 10) or (linha < 7) or (tabuleiro[linha][coluna] <> nil) then
                writeln('Posição inválida')
             else
                checagem := true;
@@ -190,7 +190,7 @@ begin
       inc(qtde);
       imprime_tabuleiro(jogador);
       writeln;
-   until (qtde = 3); {XXX: q = 40}
+   until (qtde = 40);
 end; { dispor_pecas }
 
 procedure remove_peca(peca : no_pecas);
@@ -217,6 +217,8 @@ begin
       remove_peca(atacado);
       tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];
       combate := 1;
+      writeln('Bomba desarmada com sucesso!');
+      writeln;
    end
    else
       {Exceção 2: se o espião atacar o marechal ele ganha}
@@ -225,6 +227,8 @@ begin
          remove_peca(atacado);
          tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];
          combate := 1;
+         writeln('O espião derrotou o marechal');
+         writeln;
       end
       else
          {Regra: ganha quem tiver maior rank}
@@ -233,6 +237,8 @@ begin
             remove_peca(atacado);
             tabuleiro[linha2][coluna2] := tabuleiro[linha1][coluna1];
             combate := 1;
+            writeln('O ', atacante^.nome, 'derrotou o ', atacado^.nome);
+            writeln;
          end
          else
             if (atacante^.rank = atacado^.rank) then
@@ -241,11 +247,15 @@ begin
                remove_peca(atacante);
                tabuleiro[linha2][coluna2] := nil;
                combate:=0;
+               writeln('As duas peças são de mesmo rank, portanto o combate deu empate. Ambas as peças foram retiradas do jogo.');
+               writeln;
             end
             else
             begin
                remove_peca(atacante);
                combate:=-1;
+               writeln('O ', atacado^.nome, ' derrotou o ', atacante^.nome);
+               writeln;
             end;
    {O lugar da peça atacante sempre vai ficar vazio -> ou ela toma outro lugar ou ela é derrotada}
    tabuleiro[linha1][coluna1] := nil;
@@ -485,36 +495,37 @@ begin
    while (inicio^.rank <> 0) do
       inicio := inicio^.prox;
    if (inicio^.qtde = 0) then
+   begin
       aux := true;
+      writeln('Vitória do jogador ', jogador);
+      writeln;
+   end;
    {2. checar peças móveis dos dois jogadores}
    cont := conta_pecas(jog1);
    {6 é o número máximo de peças que podem ficar imóveis no jogo, portanto só vale a pena verificar a partir dele}
    if (cont <= 6) then
       if (not pode_mover(jog1, cont)) then
+      begin
          aux := true;
+         writeln('Vitória do jogador 2');
+         writeln;
+      end;
    cont := conta_pecas(jog2);
    if (cont <= 6) then
       if (not pode_mover(jog2, cont)) then
+      begin
          aux := true;
+         writeln('Vitória do jogador 1');
+         writeln;
+      end;
    final_jogo := aux;
 end; { final_jogo }
 
-procedure teste_imprime(inicio : no_pecas );
-var aux : no_pecas;
-begin
-   aux := inicio^.prox;
-   while (aux <> nil) do
-   begin
-      writeln(aux^.rank, ' ', aux^.nome, ' ', aux^.qtde);
-      aux := aux^.prox;
-   end;
-end; { teste_imprime }
-
-
+{PROCEDIMENTOS DE OPÇÃO PARA OS JOGADORES}
 procedure blitzkrieg (inicio : no_pecas; jogador : integer);
 var
    aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
-                                                                                                              
+   
 begin
    aux := inicio^.prox;
    while (aux <> nil) do
@@ -609,7 +620,7 @@ begin
       tabuleiro[9][7] :=	sargento;
       tabuleiro[9][8] :=	bomba;
       tabuleiro[9][9] :=	espiao;
-      tabuleiro[9][10] :=   tenente;
+      tabuleiro[9][10] :=	tenente;
       tabuleiro[10][1] :=	soldado;
       tabuleiro[10][2] :=	bomba;
       tabuleiro[10][3] :=	bandeira;
@@ -624,9 +635,599 @@ begin
    
 end; { blitzkrieg }
 
+procedure tempest_defense (inicio : no_pecas; jogador : integer);
+var
+   aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
+   
+begin
+   aux := inicio^.prox;
+   while (aux <> nil) do
+   begin
+      aux^.qtde := controle_pecas[aux^.rank];
+      aux := aux^.prox;
+   end;
+   bandeira:= inicio^.prox;
+   espiao:= bandeira^.prox;
+   soldado:= espiao^.prox;
+   cabo:= soldado^.prox;
+   sargento:= cabo^.prox;
+   tenente:= sargento^.prox;
+   capitao:= tenente^.prox;
+   major:= capitao^.prox;
+   coronel:= major^.prox;
+   general:= coronel^.prox;
+   marechal:= general^.prox;
+   bomba:= marechal^.prox;
+
+   if (jogador=1) then
+   begin
+      tabuleiro[1][1] :=	soldado;
+      tabuleiro[1][2] := 	major;
+      tabuleiro[1][3] :=	general;
+      tabuleiro[1][4] :=	capitao;
+      tabuleiro[1][5] :=	soldado;
+      tabuleiro[1][6] :=	sargento;
+      tabuleiro[1][7] :=	capitao;
+      tabuleiro[1][8] :=	soldado;
+      tabuleiro[1][9] :=	coronel;
+      tabuleiro[1][10] :=	sargento;
+      tabuleiro[2][1] :=	bomba;
+      tabuleiro[2][2] :=	soldado;
+      tabuleiro[2][3] :=	soldado;
+      tabuleiro[2][4] :=	cabo;
+      tabuleiro[2][5] :=	coronel;
+      tabuleiro[2][6] :=	capitao;
+      tabuleiro[2][7] :=	tenente;
+      tabuleiro[2][8] :=	cabo;
+      tabuleiro[2][9] :=	marechal;
+      tabuleiro[2][10] :=	soldado;
+      tabuleiro[3][1] :=	major;
+      tabuleiro[3][2] :=	bomba;
+      tabuleiro[3][3] :=	tenente;
+      tabuleiro[3][4] :=	bomba;
+      tabuleiro[3][5] :=	capitao;
+      tabuleiro[3][6] :=	cabo;
+      tabuleiro[3][7] :=	bomba;
+      tabuleiro[3][8] :=	espiao;
+      tabuleiro[3][9] :=	tenente;
+      tabuleiro[3][10] :=	sargento;
+      tabuleiro[4][1] :=	bomba;
+      tabuleiro[4][2] :=	bandeira;
+      tabuleiro[4][3] :=	bomba;
+      tabuleiro[4][4] :=	sargento;
+      tabuleiro[4][5] :=	soldado;
+      tabuleiro[4][6] :=	tenente;
+      tabuleiro[4][7] :=	cabo;
+      tabuleiro[4][8] :=	soldado;
+      tabuleiro[4][9] :=	cabo;
+      tabuleiro[4][10] :=	major;
+   end
+   else
+   begin
+      tabuleiro[7][1] :=	soldado;
+      tabuleiro[7][2] :=	major;
+      tabuleiro[7][3] :=	general;
+      tabuleiro[7][4] :=	capitao;
+      tabuleiro[7][5] :=	soldado;
+      tabuleiro[7][6] :=	sargento;
+      tabuleiro[7][7] :=	capitao;
+      tabuleiro[7][8] :=	soldado;
+      tabuleiro[7][9] :=	coronel;
+      tabuleiro[7][10] :=	sargento;
+      tabuleiro[8][1] :=	bomba;
+      tabuleiro[8][2] :=	soldado;
+      tabuleiro[8][3] :=	soldado;
+      tabuleiro[8][4] :=	cabo;
+      tabuleiro[8][5] :=	coronel;
+      tabuleiro[8][6] :=	capitao;
+      tabuleiro[8][7] :=	tenente;
+      tabuleiro[8][8] :=	cabo;
+      tabuleiro[8][9] :=	marechal;
+      tabuleiro[8][10] :=	soldado;
+      tabuleiro[9][1] :=	major;
+      tabuleiro[9][2] :=	bomba;
+      tabuleiro[9][3] :=	tenente;
+      tabuleiro[9][4] :=	bomba;
+      tabuleiro[9][5] :=	capitao;
+      tabuleiro[9][6] :=	cabo;
+      tabuleiro[9][7] :=	bomba;
+      tabuleiro[9][8] :=	espiao;
+      tabuleiro[9][9] :=	tenente;
+      tabuleiro[9][10] :=	sargento;
+      tabuleiro[10][1] :=	bomba;
+      tabuleiro[10][2] :=	bandeira;
+      tabuleiro[10][3] :=	bomba;
+      tabuleiro[10][4] :=	sargento;
+      tabuleiro[10][5] :=	soldado;
+      tabuleiro[10][6] :=	tenente;
+      tabuleiro[10][7] :=	cabo;
+      tabuleiro[10][8] :=	soldado;
+      tabuleiro[10][9] :=	cabo;
+      tabuleiro[10][10] :=	major;
+   end;
+   
+end; { tempest_defense }
+
+procedure wheel_danger (inicio : no_pecas; jogador : integer);
+var
+   aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
+   
+begin
+   aux := inicio^.prox;
+   while (aux <> nil) do
+   begin
+      aux^.qtde := controle_pecas[aux^.rank];
+      aux := aux^.prox;
+   end;
+   bandeira:= inicio^.prox;
+   espiao:= bandeira^.prox;
+   soldado:= espiao^.prox;
+   cabo:= soldado^.prox;
+   sargento:= cabo^.prox;
+   tenente:= sargento^.prox;
+   capitao:= tenente^.prox;
+   major:= capitao^.prox;
+   coronel:= major^.prox;
+   general:= coronel^.prox;
+   marechal:= general^.prox;
+   bomba:= marechal^.prox;
+
+   if (jogador=1) then
+   begin
+      tabuleiro[1][1] :=	soldado;
+      tabuleiro[1][2] := 	soldado;
+      tabuleiro[1][3] :=	cabo;
+      tabuleiro[1][4] :=	major;
+      tabuleiro[1][5] :=	soldado;
+      tabuleiro[1][6] :=	soldado;
+      tabuleiro[1][7] :=	general;
+      tabuleiro[1][8] :=	soldado;
+      tabuleiro[1][9] :=	cabo;
+      tabuleiro[1][10] :=	soldado;
+      tabuleiro[2][1] :=	tenente;
+      tabuleiro[2][2] :=	bomba;
+      tabuleiro[2][3] :=	sargento;
+      tabuleiro[2][4] :=	tenente;
+      tabuleiro[2][5] :=	bomba;
+      tabuleiro[2][6] :=	tenente;
+      tabuleiro[2][7] :=	capitao;
+      tabuleiro[2][8] :=	bomba;
+      tabuleiro[2][9] :=	tenente;
+      tabuleiro[2][10] :=	major;
+      tabuleiro[3][1] :=	capitao;
+      tabuleiro[3][2] :=	coronel;
+      tabuleiro[3][3] :=	marechal;
+      tabuleiro[3][4] :=	bomba;
+      tabuleiro[3][5] :=	bandeira;
+      tabuleiro[3][6] :=	bomba;
+      tabuleiro[3][7] :=	capitao;
+      tabuleiro[3][8] :=	cabo;
+      tabuleiro[3][9] :=	sargento;
+      tabuleiro[3][10] :=	capitao;
+      tabuleiro[4][1] :=	sargento;
+      tabuleiro[4][2] :=	soldado;
+      tabuleiro[4][3] :=	sargento;
+      tabuleiro[4][4] :=	cabo;
+      tabuleiro[4][5] :=	bomba;
+      tabuleiro[4][6] :=	major;
+      tabuleiro[4][7] :=	coronel;
+      tabuleiro[4][8] :=	espiao;
+      tabuleiro[4][9] :=	soldado;
+      tabuleiro[4][10] :=	cabo;
+   end
+   else
+   begin
+      tabuleiro[7][1] :=	soldado;
+      tabuleiro[7][2] :=	soldado;
+      tabuleiro[7][3] :=	cabo;
+      tabuleiro[7][4] :=	major;
+      tabuleiro[7][5] :=	soldado;
+      tabuleiro[7][6] :=	soldado;
+      tabuleiro[7][7] :=	general;
+      tabuleiro[7][8] :=	soldado;
+      tabuleiro[7][9] :=	cabo;
+      tabuleiro[7][10] :=	soldado;
+      tabuleiro[8][1] :=	tenente;
+      tabuleiro[8][2] :=	bomba;
+      tabuleiro[8][3] :=	sargento;
+      tabuleiro[8][4] :=	tenente;
+      tabuleiro[8][5] :=	bomba;
+      tabuleiro[8][6] :=	tenente;
+      tabuleiro[8][7] :=	capitao;
+      tabuleiro[8][8] :=	bomba;
+      tabuleiro[8][9] :=	tenente;
+      tabuleiro[8][10] :=	major;
+      tabuleiro[9][1] :=	capitao;
+      tabuleiro[9][2] :=	coronel;
+      tabuleiro[9][3] :=	marechal;
+      tabuleiro[9][4] :=	bomba;
+      tabuleiro[9][5] :=	bandeira;
+      tabuleiro[9][6] :=	bomba;
+      tabuleiro[9][7] :=	capitao;
+      tabuleiro[9][8] :=	cabo;
+      tabuleiro[9][9] :=	sargento;
+      tabuleiro[9][10] :=	capitao;
+      tabuleiro[10][1] :=	sargento;
+      tabuleiro[10][2] :=	soldado;
+      tabuleiro[10][3] :=	sargento;
+      tabuleiro[10][4] :=	cabo;
+      tabuleiro[10][5] :=	bomba;
+      tabuleiro[10][6] :=	major;
+      tabuleiro[10][7] :=	coronel;
+      tabuleiro[10][8] :=	espiao;
+      tabuleiro[10][9] :=	soldado;
+      tabuleiro[10][10] :=	cabo;
+   end;
+   
+end; { wheel_danger }
+
+procedure corner_fortress (inicio : no_pecas; jogador : integer);
+var
+   aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
+   
+begin
+   aux := inicio^.prox;
+   while (aux <> nil) do
+   begin
+      aux^.qtde := controle_pecas[aux^.rank];
+      aux := aux^.prox;
+   end;
+   bandeira:= inicio^.prox;
+   espiao:= bandeira^.prox;
+   soldado:= espiao^.prox;
+   cabo:= soldado^.prox;
+   sargento:= cabo^.prox;
+   tenente:= sargento^.prox;
+   capitao:= tenente^.prox;
+   major:= capitao^.prox;
+   coronel:= major^.prox;
+   general:= coronel^.prox;
+   marechal:= general^.prox;
+   bomba:= marechal^.prox;
+
+   if (jogador=1) then
+   begin
+      tabuleiro[1][1] :=	capitao;
+      tabuleiro[1][2] := 	soldado;
+      tabuleiro[1][3] :=	general;
+      tabuleiro[1][4] :=	tenente;
+      tabuleiro[1][5] :=	soldado;
+      tabuleiro[1][6] :=	coronel;
+      tabuleiro[1][7] :=	soldado;
+      tabuleiro[1][8] :=	sargento;
+      tabuleiro[1][9] :=	tenente;
+      tabuleiro[1][10] :=	soldado;
+      tabuleiro[2][1] :=	bomba;
+      tabuleiro[2][2] :=	soldado;
+      tabuleiro[2][3] :=	major;
+      tabuleiro[2][4] :=	capitao;
+      tabuleiro[2][5] :=	soldado;
+      tabuleiro[2][6] :=	soldado;
+      tabuleiro[2][7] :=	cabo;
+      tabuleiro[2][8] :=	marechal;
+      tabuleiro[2][9] :=	cabo;
+      tabuleiro[2][10] :=	major;
+      tabuleiro[3][1] :=	sargento;
+      tabuleiro[3][2] :=	bomba;
+      tabuleiro[3][3] :=	coronel;
+      tabuleiro[3][4] :=	tenente;
+      tabuleiro[3][5] :=	bomba;
+      tabuleiro[3][6] :=	capitao;
+      tabuleiro[3][7] :=	espiao;
+      tabuleiro[3][8] :=	bomba;
+      tabuleiro[3][9] :=	soldado;
+      tabuleiro[3][10] :=	cabo;
+      tabuleiro[4][1] :=	bandeira;
+      tabuleiro[4][2] :=	sargento;
+      tabuleiro[4][3] :=	bomba;
+      tabuleiro[4][4] :=	major;
+      tabuleiro[4][5] :=	cabo;
+      tabuleiro[4][6] :=	sargento;
+      tabuleiro[4][7] :=	capitao;
+      tabuleiro[4][8] :=	cabo;
+      tabuleiro[4][9] :=	tenente;
+      tabuleiro[4][10] :=	bomba;
+   end
+   else
+   begin
+      tabuleiro[7][1] :=	capitao;
+      tabuleiro[7][2] :=	soldado;
+      tabuleiro[7][3] :=	general;
+      tabuleiro[7][4] :=	tenente;
+      tabuleiro[7][5] :=	soldado;
+      tabuleiro[7][6] :=	coronel;
+      tabuleiro[7][7] :=	soldado;
+      tabuleiro[7][8] :=	sargento;
+      tabuleiro[7][9] :=	tenente;
+      tabuleiro[7][10] :=	soldado;
+      tabuleiro[8][1] :=	bomba;
+      tabuleiro[8][2] :=	soldado;
+      tabuleiro[8][3] :=	major;
+      tabuleiro[8][4] :=	capitao;
+      tabuleiro[8][5] :=	soldado;
+      tabuleiro[8][6] :=	soldado;
+      tabuleiro[8][7] :=	cabo;
+      tabuleiro[8][8] :=	marechal;
+      tabuleiro[8][9] :=	cabo;
+      tabuleiro[8][10] :=	major;
+      tabuleiro[9][1] :=	sargento;
+      tabuleiro[9][2] :=	bomba;
+      tabuleiro[9][3] :=	coronel;
+      tabuleiro[9][4] :=	tenente;
+      tabuleiro[9][5] :=	bomba;
+      tabuleiro[9][6] :=	capitao;
+      tabuleiro[9][7] :=	espiao;
+      tabuleiro[9][8] :=	bomba;
+      tabuleiro[9][9] :=	soldado;
+      tabuleiro[9][10] :=	cabo;
+      tabuleiro[10][1] :=	bandeira;
+      tabuleiro[10][2] :=	sargento;
+      tabuleiro[10][3] :=	bomba;
+      tabuleiro[10][4] :=	major;
+      tabuleiro[10][5] :=	cabo;
+      tabuleiro[10][6] :=	sargento;
+      tabuleiro[10][7] :=	capitao;
+      tabuleiro[10][8] :=	cabo;
+      tabuleiro[10][9] :=	tenente;
+      tabuleiro[10][10] :=	bomba;
+   end;
+   
+end; { corner_fortress }
+
+procedure corner_blitz (inicio : no_pecas; jogador : integer);
+var
+   aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
+   
+begin
+   aux := inicio^.prox;
+   while (aux <> nil) do
+   begin
+      aux^.qtde := controle_pecas[aux^.rank];
+      aux := aux^.prox;
+   end;
+   bandeira:= inicio^.prox;
+   espiao:= bandeira^.prox;
+   soldado:= espiao^.prox;
+   cabo:= soldado^.prox;
+   sargento:= cabo^.prox;
+   tenente:= sargento^.prox;
+   capitao:= tenente^.prox;
+   major:= capitao^.prox;
+   coronel:= major^.prox;
+   general:= coronel^.prox;
+   marechal:= general^.prox;
+   bomba:= marechal^.prox;
+
+   if (jogador=1) then
+   begin
+      tabuleiro[1][1] :=	soldado;
+      tabuleiro[1][2] :=	tenente;
+      tabuleiro[1][3] :=	general;
+      tabuleiro[1][4] :=	capitao;
+      tabuleiro[1][5] :=	soldado;
+      tabuleiro[1][6] :=	tenente;
+      tabuleiro[1][7] :=	capitao;
+      tabuleiro[1][8] :=	coronel;
+      tabuleiro[1][9] :=	sargento;
+      tabuleiro[1][10] :=	soldado;
+      tabuleiro[2][1] :=	tenente;
+      tabuleiro[2][2] :=	soldado;
+      tabuleiro[2][3] :=	capitao;
+      tabuleiro[2][4] :=	coronel;
+      tabuleiro[2][5] :=	major;
+      tabuleiro[2][6] :=	soldado;
+      tabuleiro[2][7] :=	soldado;
+      tabuleiro[2][8] :=	cabo;
+      tabuleiro[2][9] :=	bomba;
+      tabuleiro[2][10] :=	marechal;
+      tabuleiro[3][1] :=	bomba;
+      tabuleiro[3][2] :=	major;
+      tabuleiro[3][3] :=	sargento;
+      tabuleiro[3][4] :=	major;
+      tabuleiro[3][5] :=	espiao;
+      tabuleiro[3][6] :=	cabo;
+      tabuleiro[3][7] :=	sargento;
+      tabuleiro[3][8] :=	tenente;
+      tabuleiro[3][9] :=	capitao;
+      tabuleiro[3][10] :=	cabo;
+      tabuleiro[4][1] :=	bandeira;
+      tabuleiro[4][2] :=	bomba;
+      tabuleiro[4][3] :=	soldado;
+      tabuleiro[4][4] :=	bomba;
+      tabuleiro[4][5] :=	cabo;
+      tabuleiro[4][6] :=	sargento;
+      tabuleiro[4][7] :=	bomba;
+      tabuleiro[4][8] :=	soldado;
+      tabuleiro[4][9] :=	bomba;
+      tabuleiro[4][10] :=	cabo;
+   end
+   else
+   begin
+      tabuleiro[7][1] :=	soldado;
+      tabuleiro[7][2] :=	tenente;
+      tabuleiro[7][3] :=	general;
+      tabuleiro[7][4] :=	capitao;
+      tabuleiro[7][5] :=	soldado;
+      tabuleiro[7][6] :=	tenente;
+      tabuleiro[7][7] :=	capitao;
+      tabuleiro[7][8] :=	coronel;
+      tabuleiro[7][9] :=	sargento;
+      tabuleiro[7][10] :=	soldado;
+      tabuleiro[8][1] :=	tenente;
+      tabuleiro[8][2] :=	soldado;
+      tabuleiro[8][3] :=	capitao;
+      tabuleiro[8][4] :=	coronel;
+      tabuleiro[8][5] :=	major;
+      tabuleiro[8][6] :=	soldado;
+      tabuleiro[8][7] :=	soldado;
+      tabuleiro[8][8] :=	cabo;
+      tabuleiro[8][9] :=	bomba;
+      tabuleiro[8][10] :=	marechal;
+      tabuleiro[9][1] :=	bomba;
+      tabuleiro[9][2] :=	major;
+      tabuleiro[9][3] :=	sargento;
+      tabuleiro[9][4] :=	major;
+      tabuleiro[9][5] :=	espiao;
+      tabuleiro[9][6] :=	cabo;
+      tabuleiro[9][7] :=	sargento;
+      tabuleiro[9][8] :=	tenente;
+      tabuleiro[9][9] :=	capitao;
+      tabuleiro[9][10] :=	cabo;
+      tabuleiro[10][1] :=	bandeira;
+      tabuleiro[10][2] :=	bomba;
+      tabuleiro[10][3] :=	soldado;
+      tabuleiro[10][4] :=	bomba;
+      tabuleiro[10][5] :=	cabo;
+      tabuleiro[10][6] :=	sargento;
+      tabuleiro[10][7] :=	bomba;
+      tabuleiro[10][8] :=	soldado;
+      tabuleiro[10][9] :=	bomba;
+      tabuleiro[10][10] :=	cabo;
+   end;
+   
+end; { corner_blitz }
+
+procedure shoreline_bluff (inicio : no_pecas; jogador : integer);
+var
+   aux, bandeira, espiao, soldado, cabo, sargento, tenente, capitao, major, coronel, general, marechal, bomba : no_pecas;
+   
+begin
+   aux := inicio^.prox;
+   while (aux <> nil) do
+   begin
+      aux^.qtde := controle_pecas[aux^.rank];
+      aux := aux^.prox;
+   end;
+   bandeira:= inicio^.prox;
+   espiao:= bandeira^.prox;
+   soldado:= espiao^.prox;
+   cabo:= soldado^.prox;
+   sargento:= cabo^.prox;
+   tenente:= sargento^.prox;
+   capitao:= tenente^.prox;
+   major:= capitao^.prox;
+   coronel:= major^.prox;
+   general:= coronel^.prox;
+   marechal:= general^.prox;
+   bomba:= marechal^.prox;
+
+   if (jogador=1) then
+   begin
+      tabuleiro[1][1] :=	soldado;
+      tabuleiro[1][2] := 	bomba;
+      tabuleiro[1][3] :=	bandeira;
+      tabuleiro[1][4] :=	bomba;
+      tabuleiro[1][5] :=	general;
+      tabuleiro[1][6] :=	soldado;
+      tabuleiro[1][7] :=	major;
+      tabuleiro[1][8] :=	bomba;
+      tabuleiro[1][9] :=	coronel;
+      tabuleiro[1][10] :=	soldado;
+      tabuleiro[2][1] :=	marechal;
+      tabuleiro[2][2] :=	sargento;
+      tabuleiro[2][3] :=	coronel;
+      tabuleiro[2][4] :=	sargento;
+      tabuleiro[2][5] :=	cabo;
+      tabuleiro[2][6] :=	capitao;
+      tabuleiro[2][7] :=	soldado;
+      tabuleiro[2][8] :=	sargento;
+      tabuleiro[2][9] :=	cabo;
+      tabuleiro[2][10] :=	tenente;
+      tabuleiro[3][1] :=	espiao;
+      tabuleiro[3][2] :=	major;
+      tabuleiro[3][3] :=	tenente;
+      tabuleiro[3][4] :=	bomba;
+      tabuleiro[3][5] :=	tenente;
+      tabuleiro[3][6] :=	cabo;
+      tabuleiro[3][7] :=	bomba;
+      tabuleiro[3][8] :=	tenente;
+      tabuleiro[3][9] :=	major;
+      tabuleiro[3][10] :=	capitao;
+      tabuleiro[4][1] :=	soldado;
+      tabuleiro[4][2] :=	cabo;
+      tabuleiro[4][3] :=	sargento;
+      tabuleiro[4][4] :=	capitao;
+      tabuleiro[4][5] :=	soldado;
+      tabuleiro[4][6] :=	soldado;
+      tabuleiro[4][7] :=	cabo;
+      tabuleiro[4][8] :=	bomba;
+      tabuleiro[4][9] :=	capitao;
+      tabuleiro[4][10] :=	soldado;
+   end
+   else
+   begin
+      tabuleiro[7][1] :=	soldado;
+      tabuleiro[7][2] :=	bomba;
+      tabuleiro[7][3] :=	bandeira;
+      tabuleiro[7][4] :=	bomba;
+      tabuleiro[7][5] :=	general;
+      tabuleiro[7][6] :=	soldado;
+      tabuleiro[7][7] :=	major;
+      tabuleiro[7][8] :=	bomba;
+      tabuleiro[7][9] :=	coronel;
+      tabuleiro[7][10] :=	soldado;
+      tabuleiro[8][1] :=	marechal;
+      tabuleiro[8][2] :=	sargento;
+      tabuleiro[8][3] :=	coronel;
+      tabuleiro[8][4] :=	sargento;
+      tabuleiro[8][5] :=	cabo;
+      tabuleiro[8][6] :=	capitao;
+      tabuleiro[8][7] :=	soldado;
+      tabuleiro[8][8] :=	sargento;
+      tabuleiro[8][9] :=	cabo;
+      tabuleiro[8][10] :=	tenente;
+      tabuleiro[9][1] :=	espiao;
+      tabuleiro[9][2] :=	major;
+      tabuleiro[9][3] :=	tenente;
+      tabuleiro[9][4] :=	cabo;
+      tabuleiro[9][5] :=	tenente;
+      tabuleiro[9][6] :=	cabo;
+      tabuleiro[9][7] :=	bomba;
+      tabuleiro[9][8] :=	tenente;
+      tabuleiro[9][9] :=	major;
+      tabuleiro[9][10] :=	capitao;
+      tabuleiro[10][1] :=	soldado;
+      tabuleiro[10][2] :=	cabo;
+      tabuleiro[10][3] :=	sargento;
+      tabuleiro[10][4] :=	capitao;
+      tabuleiro[10][5] :=	soldado;
+      tabuleiro[10][6] :=	soldado;
+      tabuleiro[10][7] :=	cabo;
+      tabuleiro[10][8] :=	bomba;
+      tabuleiro[10][9] :=	capitao;
+      tabuleiro[10][10] :=	soldado;
+   end;
+   
+end; { shoreline_bluff }
+
+procedure opcoes(opcao, jogador : integer);
+var
+   inicio : no_pecas;
+begin
+   if (jogador = 1) then
+      inicio := jog1
+   else
+      inicio := jog2;
+   case opcao of
+     1 : begin
+            pecas_jogadores;
+            dados_pecas(inicio, jogador);
+            dispor_pecas(jogador, inicio);
+         end;
+     2 : blitzkrieg(inicio, jogador);
+     3 : tempest_defense(inicio, jogador);
+     4 : wheel_danger(inicio, jogador);
+     5 : corner_fortress(inicio,jogador);
+     6 : corner_blitz(inicio, jogador);
+{     7 : shorelinee_bluff(inicio, jogador);}
+   else
+      writeln('Opção inválida');
+   end; { case }
+end; { opcoes }
+
 var
    final                                                     : boolean;
-   rodada, jogador, linha_atual, linha, coluna_atual, coluna : integer;
+   rodada, opcao, jogador, linha_atual, linha, coluna_atual, coluna : integer;
    
 {Programa principal}
 begin
@@ -645,7 +1246,7 @@ begin
    writeln;
    writeln;
    writeln('Divirtam-se ^^':47);
-   writeln('Digite uma tecla para iniciar o jogo':62);
+   writeln('Digite uma tecla para iniciar o jogo':58);
    readkey;
    clrscr;
    
@@ -656,28 +1257,25 @@ begin
    jog1^.jogador := 1;
    new(jog2);
    jog2^.jogador := 2;
-   {Criação de lista para os dois jogadores}
-   pecas_jogadores;
-   dados_pecas(jog1, 1);
-   dados_pecas(jog2, 2);
-
-   teste_imprime(jog1);
-   blitzkrieg(jog1, 1);
-   blitzkrieg(jog2, 2);
    
-   {Dispõe peças para os dois jogadores}
+   {Dispõe peças para os dois jogadores} 
 
    writeln('Vez do jogador 1');
-{   writeln;
-   dispor_pecas(1,jog1); 
    writeln;
- }  
-  { clrscr;
-   imprime_tabuleiro(2);
-   writeln('Vez do jogador 2');
+   writeln('Escolha a opção:');
+   writeln('1: dispor as peças manualmente');
    writeln;
-   dispor_pecas(2,jog2);
-}
+   writeln('Para as opções pré-configuradas digite:');
+   writeln('2: Ataque relâmpago');
+   writeln('3: Tempestade de defesa');
+   writeln('4: Perigo de rodas');
+   writeln('5: Fortaleza de canto');
+   writeln('6: XXX');
+   writeln('7: Blefe litoral');
+   readln(opcao);
+
+   opcoes(opcao, 1);
+   
    jogador := 1;
    clrscr;
    rodada := 0;
