@@ -1280,8 +1280,10 @@ begin
    jog1^.jogador := 1;
    new(jog2);
    jog2^.jogador := 2;
+   {Criação da lista de peças para os dois jogadores}
    dados_pecas(jog1, 1);
    dados_pecas(jog2, 2);
+   {Preenchimento do vetor de controle da quantidade de peças}
    pecas_jogadores;
 
    {Dispõe peças para os dois jogadores}
@@ -1293,7 +1295,6 @@ begin
    jogador := 1;
    clrscr;
    rodada := 0;
-
    {Inicio do jogo}
    repeat
       writeln('Vez do jogador ', jogador);
